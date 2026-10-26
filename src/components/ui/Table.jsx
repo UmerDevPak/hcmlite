@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 export function Table({ children, className = "" }) {
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
+    <div className="w-full overflow-x-auto no-scrollbar rounded-xl border border-zinc-200 dark:border-zinc-800">
       <table className={cn("w-full text-left text-sm text-zinc-600 dark:text-zinc-300", className)}>
         {children}
       </table>

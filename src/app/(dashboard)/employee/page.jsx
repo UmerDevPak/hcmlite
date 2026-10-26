@@ -693,9 +693,8 @@ export default function EmployeeDashboardPage() {
                   onAction={() => setIsLeaveModalOpen(true)}
                 />
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
+                <Table>
+                  <TableHeader>
                       <TableRow>
                         <TableHead>Type</TableHead>
                         <TableHead>Duration & Dates</TableHead>
@@ -736,7 +735,6 @@ export default function EmployeeDashboardPage() {
                       ))}
                     </TableBody>
                   </Table>
-                </div>
               )}
             </CardContent>
           </Card>
@@ -761,9 +759,8 @@ export default function EmployeeDashboardPage() {
               </Link>
             </CardHeader>
             <CardContent className="flex-1">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
+              <Table>
+                <TableHeader>
                     <TableRow>
                       <TableHead>Date</TableHead>
                       <TableHead>Clock In</TableHead>
@@ -808,7 +805,6 @@ export default function EmployeeDashboardPage() {
                     ))}
                   </TableBody>
                 </Table>
-              </div>
             </CardContent>
           </Card>
         </div>

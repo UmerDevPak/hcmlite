@@ -133,8 +133,9 @@ export default function AdminDashboardPage() {
         <StatCard
           title="Total Active Headcount"
           value={activeHeadcount || 0}
-          change="+8.3% from last quarter"
+          change="+8.3%"
           changeType="positive"
+          subtext="Net positive growth vs last quarter"
           icon={Users}
         />
 
@@ -142,8 +143,9 @@ export default function AdminDashboardPage() {
         <StatCard
           title="Attrition Rate YTD"
           value={`${attritionRate || 2.4}%`}
-          change="-0.6% vs industry average"
+          change="-0.6%"
           changeType="positive"
+          subtext="Healthy retention benchmark"
           icon={TrendingDown}
         />
 
@@ -151,8 +153,9 @@ export default function AdminDashboardPage() {
         <StatCard
           title="Total Monthly Payroll Cost"
           value={formatCurrency(totalMonthlyPayroll || 0)}
-          change="Gross = Basic * 1.5 formula"
+          change="+3.1%"
           changeType="neutral"
+          subtext="Gross formula (Basic × 1.5)"
           icon={CreditCard}
         />
 
@@ -160,8 +163,8 @@ export default function AdminDashboardPage() {
         <StatCard
           title="Average Salary"
           value={formatCurrency(averageSalary || 0)}
-          change="Across all departments"
           changeType="neutral"
+          subtext="Across all 6 company divisions"
           icon={DollarSign}
         />
       </div>

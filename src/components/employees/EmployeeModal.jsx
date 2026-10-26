@@ -204,7 +204,7 @@ export function EmployeeModal({ isOpen, onClose, employee = null, onSaved }) {
               </span>
             </div>
 
-            <div className="flex items-center gap-2.5 overflow-x-auto pb-1 pt-0.5 scrollbar-thin">
+            <div className="flex items-center gap-2.5 flex-wrap pt-0.5">
               {ALL_AVATAR_PRESETS.map((preset) => {
                 const isSelected = selectedAvatar === preset.dataUri || (!selectedAvatar && autoAvatar === preset.dataUri);
                 return (

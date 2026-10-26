@@ -23,6 +23,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/Table";
 import { Tabs } from "@/components/ui/Tabs";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Avatar } from "@/components/ui/Avatar";
 import { LeaveRequestModal } from "@/components/leave/LeaveRequestModal";
 
 export default function LeavePage() {
@@ -162,28 +163,32 @@ export default function LeavePage() {
               />
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Employee</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Dates</TableHead>
-                    <TableHead>Days</TableHead>
-                    <TableHead>Reason</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredRequests.map((req) => (
-                    <TableRow key={req.id}>
-                      <TableCell>
-                        <div className="font-semibold text-zinc-900 dark:text-zinc-100">
-                          {req.employeeName}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Employee</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Dates</TableHead>
+                  <TableHead>Days</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredRequests.map((req) => (
+                  <TableRow key={req.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2.5">
+                        <Avatar name={req.employeeName} size="sm" />
+                        <div>
+                          <div className="font-semibold text-zinc-900 dark:text-zinc-100">
+                            {req.employeeName}
+                          </div>
+                          <div className="text-[11px] text-zinc-400 font-mono">{req.id}</div>
                         </div>
-                        <div className="text-[11px] text-zinc-400 font-mono">{req.id}</div>
-                      </TableCell>
+                      </div>
+                    </TableCell>
                       <TableCell className="font-medium text-zinc-800 dark:text-zinc-200">
                         {req.leaveType}
                       </TableCell>
@@ -242,7 +247,6 @@ export default function LeavePage() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
           )}
         </Card>
       </div>

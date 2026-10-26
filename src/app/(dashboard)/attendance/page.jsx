@@ -223,9 +223,8 @@ export default function AttendancePage() {
               />
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
+            <Table>
+              <TableHeader>
                   <TableRow>
                     <TableHead>Employee</TableHead>
                     <TableHead>Status</TableHead>
@@ -274,7 +273,6 @@ export default function AttendancePage() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
           )}
         </CardContent>
       </Card>
