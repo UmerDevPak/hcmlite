@@ -80,20 +80,51 @@ export function AuthProvider({ children }) {
 
             const demoMatch = findDemoUser(firebaseUser.email);
 
-            let detectedRole = ROLES.EMPLOYEE;
-            const emailLower = (firebaseUser.email || "").toLowerCase();
+            let detectedRole = null;
             if (profile?.role) {
               detectedRole = profile.role;
             } else if (empRecord?.role) {
               detectedRole = empRecord.role;
-            } else if (demoMatch?.role) {
+            }
+
+            // Also check localStorage registered users
+            if (!detectedRole && typeof window !== "undefined") {
+              try {
+                const regUsers = JSON.parse(localStorage.getItem("hcm_lite_registered_users") || "[]");
+                const regMatch = regUsers.find((u) => u.email?.toLowerCase() === (firebaseUser.email || "").toLowerCase());
+                if (regMatch?.role) detectedRole = regMatch.role;
+              } catch (e) {}
+            }
+
+            if (!detectedRole && demoMatch?.role) {
               detectedRole = demoMatch.role;
-            } else if (emailLower === "admin@hcmlite.internal" || emailLower.startsWith("admin@")) {
-              detectedRole = "ADMIN";
-            } else if (emailLower === "hr@hcmlite.internal" || emailLower.startsWith("hr@")) {
-              detectedRole = "HR";
+            }
+
+            if (!detectedRole) {
+              const emailLower = (firebaseUser.email || "").toLowerCase();
+              if (emailLower === "admin@hcmlite.internal" || emailLower.startsWith("admin@")) {
+                detectedRole = "ADMIN";
+              } else if (emailLower === "hr@hcmlite.internal" || emailLower.startsWith("hr@")) {
+                detectedRole = "HR";
+              } else {
+                detectedRole = ROLES.EMPLOYEE;
+              }
             }
             const activeRole = normalizeRole(detectedRole);
+
+            // Strict Role Compliance: If a specific role was expected on login, verify before setting state
+            const expectedRole = typeof window !== "undefined" ? sessionStorage.getItem("hcm_expected_role") : null;
+            if (expectedRole && activeRole !== normalizeRole(expectedRole)) {
+              console.warn("[AuthContext] onAuthStateChanged rejected role mismatch:", activeRole, "!=", expectedRole);
+              try {
+                const { signOut: fbSignOut } = await import("firebase/auth");
+                await fbSignOut(auth);
+              } catch (e) {}
+              setUser(null);
+              setRole(null);
+              setLoading(false);
+              return;
+            }
 
             const activeDisplayName =
               empRecord?.name ||
@@ -227,15 +258,49 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const signIn = async (email, password) => {
+  const signIn = async (email, password, requiredRole = null) => {
     setLoading(true);
     try {
+      if (requiredRole && typeof window !== "undefined") {
+        sessionStorage.setItem("hcm_expected_role", normalizeRole(requiredRole));
+      }
       const authResult = await authService.signInWithEmailPassword(email, password);
       const normalizedRole = normalizeRole(authResult.role);
+
+      // STRICT ROLE VERIFICATION:
+      // If a required role is specified on login, the account's role MUST match!
+      if (requiredRole) {
+        const expected = normalizeRole(requiredRole);
+        if (normalizedRole !== expected) {
+          // REVOKE SESSION IMMEDIATELY
+          try {
+            if (isLiveFirebaseConfigured && auth) {
+              const { signOut: fbSignOut } = await import("firebase/auth");
+              await fbSignOut(auth);
+            }
+          } catch (e) {}
+          if (typeof window !== "undefined") {
+            sessionStorage.removeItem("hcm_expected_role");
+            localStorage.removeItem("hcm_lite_cached_session");
+            localStorage.removeItem("hcm_lite_demo_user_uid");
+            localStorage.setItem("hcm_lite_logged_out", "true");
+          }
+          setUser(null);
+          setRole(null);
+
+          const roleLabels = { ADMIN: "Admin", HR: "HR", EMPLOYEE: "Employee" };
+          const actualLabel = roleLabels[normalizedRole] || normalizedRole;
+          const expectedLabel = roleLabels[expected] || expected;
+          throw new Error(`ROLE_MISMATCH:${expectedLabel}:${actualLabel}`);
+        }
+      }
+
       const updatedUser = { ...authResult, role: normalizedRole };
       setUser(updatedUser);
       setRole(normalizedRole);
       if (typeof window !== "undefined") {
+        sessionStorage.removeItem("hcm_expected_role");
+        localStorage.setItem("hcm_lite_cached_session", JSON.stringify(updatedUser));
         localStorage.setItem("hcm_lite_demo_user_uid", authResult.uid);
         localStorage.removeItem("hcm_lite_logged_out");
       }

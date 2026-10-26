@@ -37,11 +37,11 @@ export default function LoginPage() {
 
   // If already authenticated, cannot return to /login
   useEffect(() => {
-    if (!authLoading && user) {
+    if (!authLoading && !loading && user) {
       const dest = getRoleDashboard(user.role);
       router.replace(dest);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, loading, router]);
 
   // First-Run Detection: If company_settings is empty, redirect to /setup
   useEffect(() => {
@@ -65,7 +65,8 @@ export default function LoginPage() {
     setLoginError("");
 
     try {
-      const authUser = await signIn(email, password);
+      // Pass selectedRole so AuthContext strictly verifies the account's role
+      const authUser = await signIn(email, password, selectedRole);
 
       // First-Login Password Change check
       if (authUser?.mustChangePassword) {
@@ -74,43 +75,7 @@ export default function LoginPage() {
         return;
       }
 
-      // CRITICAL STRICT ROLE ENFORCEMENT:
-      // The authenticated account's actual role MUST match the selected role.
-      // HR cannot log in as Admin, Admin cannot log in as HR, Employee cannot log in as Admin/HR.
       const authenticatedRole = normalizeRole(authUser?.role);
-      const targetRole = normalizeRole(selectedRole);
-
-      if (authenticatedRole !== targetRole) {
-        // Revoke session immediately to prevent unauthorized access
-        try {
-          if (auth) {
-            const { signOut: fbSignOut } = await import("firebase/auth");
-            await fbSignOut(auth);
-          }
-        } catch (e) {}
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("hcm_lite_cached_session");
-          localStorage.removeItem("hcm_lite_demo_user_uid");
-          localStorage.setItem("hcm_lite_logged_out", "true");
-          sessionStorage.removeItem("hcm_role_login_popup");
-          sessionStorage.removeItem("hcm_role_login_flash");
-        }
-
-        const roleNames = {
-          ADMIN: "Administrator",
-          HR: "Human Resources (HR)",
-          EMPLOYEE: "Employee",
-        };
-        const targetName = roleNames[targetRole] || targetRole;
-        const actualName = roleNames[authenticatedRole] || authenticatedRole;
-
-        const mismatchMsg = `Access Denied: You selected "${targetName}", but this account is registered as "${actualName}". An ${actualName} account cannot log in as ${targetName}.`;
-        setLoginError(mismatchMsg);
-        notifyError("Role Mismatch", mismatchMsg);
-        setLoading(false);
-        return;
-      }
-
       const roleLabel = ROLE_LABELS[authenticatedRole] || "Employee";
       const loginMsg = `Logged in successfully as ${roleLabel}`;
       try {
@@ -136,14 +101,21 @@ export default function LoginPage() {
       let rawMsg = (err.message || "").toLowerCase();
       let errorMsg = "Invalid credentials";
 
-      if (rawMsg.includes("deactivated") || rawMsg.includes("user-disabled")) {
+      if (err.message?.startsWith("ROLE_MISMATCH:")) {
+        const parts = err.message.split(":");
+        const expected = parts[1] || "Selected Role";
+        const actual = parts[2] || "Account Role";
+        errorMsg = `Login Failed: This account was created as "${actual}". You selected "${expected}" on login. You can only log in by selecting "${actual}".`;
+      } else if (rawMsg.includes("deactivated") || rawMsg.includes("user-disabled")) {
         errorMsg = "Account deactivated";
       } else if (rawMsg.includes("invalid-credential") || rawMsg.includes("wrong-password") || rawMsg.includes("user-not-found")) {
-        errorMsg = "Invalid credentials";
+        errorMsg = "Invalid credentials. Please verify your email and password.";
       } else if (rawMsg.includes("too-many-requests")) {
         errorMsg = "Too many failed attempts. Try again later.";
       } else if (rawMsg.includes("no employee record found")) {
         errorMsg = "No employee record found for this work email.";
+      } else if (err.message) {
+        errorMsg = err.message;
       }
 
       setLoginError(errorMsg);
@@ -153,98 +125,12 @@ export default function LoginPage() {
     }
   };
 
-  const handleDemoLogin = async (demoUser) => {
-    if (demoUser?.mustChangePassword) {
-      setPendingUser(demoUser);
-      setShowForcePasswordModal(true);
-      return;
-    }
-
-    setLoading(true);
+  const handleSelectDemoPersona = (demoUser) => {
+    const canonical = normalizeRole(demoUser.role);
+    setSelectedRole(canonical);
+    setEmail(demoUser.email);
+    setPassword("Password123!");
     setLoginError("");
-
-    try {
-      const canonical = normalizeRole(demoUser.role);
-      setSelectedRole(canonical);
-      const roleLabel = ROLE_LABELS[canonical] || "Employee";
-      const loginMsg = `Logged in successfully as ${roleLabel}`;
-
-      // If live Firebase is configured, authentic sign in via verified demo persona credentials
-      if (isLiveFirebaseConfigured) {
-        const emailMap = {
-          ADMIN: "admin@hcmlite.internal",
-          HR: "hr@hcmlite.internal",
-          EMPLOYEE: "employee@hcmlite.internal",
-        };
-        const targetEmail = emailMap[canonical] || demoUser.email;
-        const authUser = await signIn(targetEmail, "Password123!");
-        const dest = getRoleDashboard(authUser?.role || canonical);
-        try {
-          sessionStorage.setItem(
-            "hcm_role_login_popup",
-            JSON.stringify({
-              role: roleLabel,
-              name: authUser?.displayName || demoUser.displayName || roleLabel,
-              email: authUser?.email || targetEmail,
-              message: loginMsg,
-            })
-          );
-          sessionStorage.setItem(
-            "hcm_role_login_flash",
-            JSON.stringify({ role: roleLabel, message: loginMsg })
-          );
-        } catch (e) {}
-        notifySuccess("Authentication Success", loginMsg);
-        router.push(dest);
-        return;
-      }
-
-      await switchDemoRole(demoUser.role);
-      const dest = getRoleDashboard(demoUser.role);
-      try {
-        sessionStorage.setItem(
-          "hcm_role_login_popup",
-          JSON.stringify({
-            role: roleLabel,
-            name: demoUser.displayName || roleLabel,
-            email: demoUser.email,
-            message: loginMsg,
-          })
-        );
-        sessionStorage.setItem(
-          "hcm_role_login_flash",
-          JSON.stringify({ role: roleLabel, message: loginMsg })
-        );
-      } catch (e) {}
-      notifySuccess("Authentication Success", loginMsg);
-      router.push(dest);
-    } catch (err) {
-      console.warn("Live persona switch note:", err);
-      const canonical = normalizeRole(demoUser.role);
-      const roleLabel = ROLE_LABELS[canonical] || "Employee";
-      const loginMsg = `Logged in successfully as ${roleLabel}`;
-      await switchDemoRole(demoUser.role);
-      const dest = getRoleDashboard(demoUser.role);
-      try {
-        sessionStorage.setItem(
-          "hcm_role_login_popup",
-          JSON.stringify({
-            role: roleLabel,
-            name: demoUser.displayName || roleLabel,
-            email: demoUser.email,
-            message: loginMsg,
-          })
-        );
-        sessionStorage.setItem(
-          "hcm_role_login_flash",
-          JSON.stringify({ role: roleLabel, message: loginMsg })
-        );
-      } catch (e) {}
-      notifySuccess("Authentication Success", loginMsg);
-      router.push(dest);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handlePasswordChanged = async () => {
@@ -421,7 +307,7 @@ export default function LoginPage() {
                   <button
                     key={u.uid}
                     type="button"
-                    onClick={() => handleDemoLogin(u)}
+                    onClick={() => handleSelectDemoPersona(u)}
                     className="flex items-center gap-2.5 p-2 rounded-lg border border-zinc-800 bg-zinc-900 hover:border-indigo-500/50 hover:bg-zinc-800/80 transition-all text-left text-xs"
                   >
                     <Icon className="w-4 h-4 text-indigo-400 shrink-0" />

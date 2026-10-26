@@ -222,15 +222,37 @@ export const authService = {
         const empRecord = await employeeService.getEmployeeById(cred.user.uid) || await employeeService.getEmployeeByEmail(cleanEmail);
         const mustChange = profileData?.mustChangePassword || empRecord?.mustChangePassword || false;
 
-        let detectedRole = ROLES.EMPLOYEE;
+        let detectedRole = null;
         if (profileData?.role) {
           detectedRole = profileData.role;
         } else if (empRecord?.role) {
           detectedRole = empRecord.role;
-        } else if (cleanEmail === "admin@hcmlite.internal" || cleanEmail.startsWith("admin@")) {
-          detectedRole = "ADMIN";
-        } else if (cleanEmail === "hr@hcmlite.internal" || cleanEmail.startsWith("hr@")) {
-          detectedRole = "HR";
+        }
+
+        // Also check registered accounts in localStorage
+        if (!detectedRole && typeof window !== "undefined") {
+          try {
+            const regUsers = JSON.parse(localStorage.getItem("hcm_lite_registered_users") || "[]");
+            const regMatch = regUsers.find((u) => u.email?.toLowerCase() === cleanEmail);
+            if (regMatch?.role) detectedRole = regMatch.role;
+          } catch (e) {}
+        }
+
+        // Also check predefined demo accounts
+        if (!detectedRole) {
+          const demoUserMatch = findDemoUser(cleanEmail);
+          if (demoUserMatch?.role) detectedRole = demoUserMatch.role;
+        }
+
+        // Specific email prefix conventions
+        if (!detectedRole) {
+          if (cleanEmail === "admin@hcmlite.internal" || cleanEmail.startsWith("admin@")) {
+            detectedRole = "ADMIN";
+          } else if (cleanEmail === "hr@hcmlite.internal" || cleanEmail.startsWith("hr@")) {
+            detectedRole = "HR";
+          } else {
+            detectedRole = ROLES.EMPLOYEE;
+          }
         }
         const assignedRole = normalizeRole(detectedRole);
 

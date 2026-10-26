@@ -106,6 +106,29 @@ export default function SignUpPage() {
         jobTitle: formData.jobTitle.trim() || `${formData.role} Member`,
       });
 
+      // Synchronize into registered users registry
+      if (typeof window !== "undefined") {
+        try {
+          const regUsers = JSON.parse(localStorage.getItem("hcm_lite_registered_users") || "[]");
+          const cleanEmail = formData.email.trim().toLowerCase();
+          const cleanRole = normalizeRole(formData.role);
+          const idx = regUsers.findIndex((u) => u.email?.toLowerCase() === cleanEmail);
+          const record = {
+            email: cleanEmail,
+            role: cleanRole,
+            displayName: formData.displayName.trim(),
+            department: formData.department,
+            jobTitle: formData.jobTitle.trim() || `${cleanRole} Member`,
+          };
+          if (idx !== -1) {
+            regUsers[idx] = { ...regUsers[idx], ...record };
+          } else {
+            regUsers.push(record);
+          }
+          localStorage.setItem("hcm_lite_registered_users", JSON.stringify(regUsers));
+        } catch (e) {}
+      }
+
       const roleLabel = ROLE_LABELS[normalizeRole(formData.role)] || "Employee";
       const loginMsg = `Logged in successfully as ${roleLabel}`;
       try {
