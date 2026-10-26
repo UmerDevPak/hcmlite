@@ -200,7 +200,8 @@ export default function EmployeesPage() {
           }}
         />
       ) : viewMode === "table" ? (
-        <Table>
+        <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm">
+          <Table>
           <TableHeader>
               <TableRow>
                 <TableHead>Employee</TableHead>
@@ -292,6 +293,7 @@ export default function EmployeesPage() {
               ))}
             </TableBody>
           </Table>
+        </div>
       ) : (
         /* Grid View */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

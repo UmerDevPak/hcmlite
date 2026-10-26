@@ -163,7 +163,8 @@ export default function PayrollPage() {
               />
             </div>
           ) : (
-            <Table>
+            <div className="overflow-x-auto">
+              <Table>
               <TableHeader>
                   <TableRow>
                     <TableHead>Batch ID</TableHead>
@@ -226,6 +227,7 @@ export default function PayrollPage() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -293,7 +293,7 @@ export default function HrDashboardPage() {
               All Requests <ArrowRight className="w-3 h-3" />
             </Link>
           </CardHeader>
-          <CardContent className="p-2 sm:p-3">
+          <CardContent>
             {pendingItems.length === 0 ? (
               <div className="p-8 text-center text-xs text-zinc-400 space-y-1">
                 <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto opacity-70 mb-2" />
@@ -301,85 +301,78 @@ export default function HrDashboardPage() {
                 <p>All employee leave requests and attendance adjustments have been reviewed.</p>
               </div>
             ) : (
-              <div className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
-                {pendingItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-850/50 transition-colors rounded-xl"
-                  >
-                    {/* Left: Avatar + Details */}
-                    <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
-                      <Avatar
-                        name={item.employeeName}
-                        id={item.employeeId}
-                        size="md"
-                        className="shrink-0 mt-0.5 sm:mt-0"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-semibold text-xs text-zinc-900 dark:text-zinc-100">
-                            {item.employeeName}
-                          </span>
-                          <span className="text-[10px] text-zinc-400 font-mono px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">
-                            {item.employeeId}
-                          </span>
-                          <Badge
-                            variant={item.sourceType === "LEAVE" ? "info" : "warning"}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Employee</TableHead>
+                    <TableHead>Request Type</TableHead>
+                    <TableHead>Dates & Duration</TableHead>
+                    <TableHead>Reason</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium text-xs text-zinc-100">
+                        <div className="flex items-center gap-2">
+                          <Avatar name={item.employeeName} id={item.employeeId} size="sm" />
+                          <div>
+                            <div>{item.employeeName}</div>
+                            <span className="block text-[10px] text-zinc-400 font-mono">
+                              {item.employeeId}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={item.sourceType === "LEAVE" ? "info" : "warning"}
+                          size="sm"
+                        >
+                          {item.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs text-zinc-300">
+                        {item.details}
+                      </TableCell>
+                      <TableCell className="text-xs text-zinc-400 max-w-xs truncate">
+                        {item.reason}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
                             size="sm"
+                            variant="outline"
+                            className="text-emerald-400 border-emerald-500/30 hover:bg-emerald-950/40 text-xs px-2 py-1"
+                            icon={Check}
+                            onClick={() => handleApprove(item)}
                           >
-                            {item.category}
-                          </Badge>
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-rose-400 hover:bg-rose-950/40 text-xs px-2 py-1"
+                            icon={X}
+                            onClick={() => handleReject(item)}
+                          >
+                            Reject
+                          </Button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteInboxItem(item)}
+                            title="Delete / Dismiss request"
+                            className="p-1 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
-
-                        {/* Dates / Duration & Reason */}
-                        <div className="mt-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs">
-                          <span className="text-zinc-700 dark:text-zinc-300 font-medium text-xs">
-                            {item.details}
-                          </span>
-                          {item.reason && (
-                            <>
-                              <span className="text-zinc-400 dark:text-zinc-600 hidden sm:inline">•</span>
-                              <span className="text-zinc-500 dark:text-zinc-400 italic text-[11px] truncate max-w-sm">
-                                &ldquo;{item.reason}&rdquo;
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right: Actions */}
-                    <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-emerald-500 hover:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10 text-xs px-2.5 py-1"
-                        icon={Check}
-                        onClick={() => handleApprove(item)}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs px-2.5 py-1"
-                        icon={X}
-                        onClick={() => handleReject(item)}
-                      >
-                        Reject
-                      </Button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteInboxItem(item)}
-                        title="Delete / Dismiss request"
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             )}
           </CardContent>
         </Card>
