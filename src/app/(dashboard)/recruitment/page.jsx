@@ -159,17 +159,17 @@ export default function RecruitmentPage() {
       </div>
 
       {activeTab === "pipeline" ? (
-        /* Kanban Board - Fluid Horizontal Scroll */
+        /* Kanban Board - Fluid Horizontal Scroll with Uniform Column Heights */
         <div
           ref={pipelineScrollRef}
-          className="flex gap-4 overflow-x-auto pb-6 pt-1 scroll-smooth items-start -mx-4 px-4 sm:mx-0 sm:px-0"
+          className="flex gap-4 overflow-x-auto pb-6 pt-1 scroll-smooth items-stretch -mx-4 px-4 sm:mx-0 sm:px-0"
         >
           {kanbanColumns.map((stage) => {
             const stageCandidates = candidates.filter((c) => c.stage === stage);
             return (
               <div
                 key={stage}
-                className="w-72 sm:w-80 shrink-0 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 p-3.5 flex flex-col shadow-sm"
+                className="w-72 sm:w-80 shrink-0 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 p-3.5 flex flex-col shadow-sm min-h-[580px]"
               >
                 <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800/80 mb-3">
                   <div className="flex items-center gap-2">
@@ -183,37 +183,43 @@ export default function RecruitmentPage() {
                   </span>
                 </div>
 
-                <div className="space-y-3 flex-1 min-h-[140px]">
+                <div className="space-y-3 flex-1 flex flex-col min-h-[160px]">
                   {stageCandidates.map((c) => (
                     <Card
                       key={c.id}
-                      className="p-3.5 space-y-2.5 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/80 hover:border-indigo-500/50 transition-all duration-150 shadow-subtle group"
+                      className="p-3.5 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/80 hover:border-indigo-500/50 transition-all duration-150 shadow-subtle group flex flex-col justify-between min-h-[200px]"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <Avatar name={c.name} size="sm" className="shrink-0" />
-                          <div className="min-w-0 flex-1">
-                            <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate group-hover:text-indigo-400 transition-colors">
-                              {c.name}
-                            </div>
-                            <div className="text-[10px] text-zinc-400 mt-0.5 truncate">
-                              {c.jobTitle}
+                      <div className="space-y-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                            <Avatar name={c.name} size="sm" className="shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate group-hover:text-indigo-400 transition-colors">
+                                {c.name}
+                              </div>
+                              <div className="text-[10px] text-zinc-400 mt-0.5 truncate">
+                                {c.jobTitle}
+                              </div>
                             </div>
                           </div>
+                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[11px] font-bold font-mono shrink-0">
+                            <Star className="w-3 h-3 fill-amber-400" />
+                            {c.rating}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[11px] font-bold font-mono shrink-0">
-                          <Star className="w-3 h-3 fill-amber-400" />
-                          {c.rating}
+
+                        <div className="text-[11px] text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-900/90 p-2.5 rounded-lg leading-relaxed border border-zinc-200/50 dark:border-zinc-800/60 min-h-[52px] flex items-center">
+                          {c.notes ? (
+                            <span className="line-clamp-2">&ldquo;{c.notes}&rdquo;</span>
+                          ) : (
+                            <span className="text-zinc-400 dark:text-zinc-500 italic text-[10px]">
+                              No evaluation notes recorded
+                            </span>
+                          )}
                         </div>
                       </div>
 
-                      {c.notes && (
-                        <p className="text-[11px] text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-900/90 p-2.5 rounded-lg leading-relaxed border border-zinc-200/50 dark:border-zinc-800/60">
-                          &ldquo;{c.notes}&rdquo;
-                        </p>
-                      )}
-
-                      <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 space-y-2">
+                      <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 space-y-2 mt-auto">
                         <div className="flex items-center justify-between">
                           <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono flex items-center gap-1">
                             <span className="text-zinc-400">Applied:</span>
@@ -252,7 +258,7 @@ export default function RecruitmentPage() {
                   ))}
 
                   {stageCandidates.length === 0 && (
-                    <div className="h-28 flex flex-col items-center justify-center text-center p-3 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-100/40 dark:bg-zinc-900/20 text-zinc-400 dark:text-zinc-500 space-y-1">
+                    <div className="flex-1 min-h-[180px] flex flex-col items-center justify-center text-center p-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-100/40 dark:bg-zinc-900/20 text-zinc-400 dark:text-zinc-500 space-y-1.5">
                       <Sparkles className="w-4 h-4 opacity-40 mb-0.5" />
                       <span className="text-xs font-medium">No candidates in {stage}</span>
                       <span className="text-[10px] text-zinc-500">Move candidates using dropdown</span>
@@ -264,10 +270,10 @@ export default function RecruitmentPage() {
           })}
         </div>
       ) : (
-        /* Jobs List */
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        /* Jobs List with Uniform Card Heights */
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
           {jobs.map((job) => (
-            <Card key={job.id} className="p-5 flex flex-col justify-between space-y-4">
+            <Card key={job.id} className="p-5 flex flex-col justify-between space-y-4 h-full min-h-[240px]">
               <div>
                 <div className="flex items-start justify-between">
                   <Badge variant="success" dot>
@@ -287,7 +293,7 @@ export default function RecruitmentPage() {
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-1.5 text-xs text-zinc-400">
+              <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-1.5 text-xs text-zinc-400 mt-auto">
                 <div className="flex justify-between">
                   <span>Location</span>
                   <span className="text-zinc-200">{job.location}</span>

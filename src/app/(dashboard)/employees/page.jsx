@@ -296,9 +296,9 @@ export default function EmployeesPage() {
         </div>
       ) : (
         /* Grid View */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
           {employees.map((emp) => (
-            <Card key={emp.id} className="p-5 flex flex-col justify-between">
+            <Card key={emp.id} className="p-5 flex flex-col justify-between h-full min-h-[220px]">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar src={emp.avatar} name={emp.name} size="md" />
@@ -337,7 +337,7 @@ export default function EmployeesPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center justify-between pt-2 mt-auto">
                 <span className="text-[11px] text-zinc-500 font-mono">{emp.id}</span>
                 <Link href={`/employees/${emp.id}`}>
                   <Button variant="ghost" size="sm" icon={ExternalLink}>

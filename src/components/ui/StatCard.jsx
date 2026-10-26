@@ -29,7 +29,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/70 p-5 shadow-sm transition-all hover:border-zinc-300 dark:hover:border-zinc-700/80 group flex flex-col justify-between",
+        "rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/70 p-5 shadow-sm transition-all hover:border-zinc-300 dark:hover:border-zinc-700/80 group flex flex-col justify-between h-full min-h-[140px]",
         className
       )}
     >
