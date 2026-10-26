@@ -30,6 +30,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Tabs } from "@/components/ui/Tabs";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Avatar } from "@/components/ui/Avatar";
+import { resolveAvatar } from "@/lib/avatarSystem";
 
 export default function MyProfilePage() {
   const { user } = useAuth();
@@ -51,7 +52,7 @@ export default function MyProfilePage() {
         }
 
         if (emp && !emp.avatar) {
-          emp.avatar = user?.avatar || user?.photoURL || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80";
+          emp.avatar = user?.avatar || user?.photoURL || resolveAvatar({ name: emp.name, email: emp.email, id: emp.id });
         }
 
         if (!emp) {
@@ -67,7 +68,7 @@ export default function MyProfilePage() {
             hireDate: new Date().toISOString().split("T")[0],
             annualSalary: 95000,
             location: "San Francisco, CA (HQ)",
-            avatar: user.avatar || user.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+            avatar: user.avatar || user.photoURL || resolveAvatar({ name: user.displayName, email: user.email, id: user.employeeId }),
           };
         }
 

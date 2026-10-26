@@ -1,6 +1,7 @@
 import { db, auth, isLiveFirebaseConfigured } from "@/lib/firebase/client";
 import { ROLES } from "@/lib/constants";
 import { employeeService } from "./employeeService";
+import { resolveAvatar } from "@/lib/avatarSystem";
 
 const STORAGE_SETTINGS = "hcm_lite_company_settings";
 
@@ -62,7 +63,7 @@ export const setupService = {
       mustChangePassword: false,
       hireDate: new Date().toISOString().split("T")[0],
       createdAt: new Date().toISOString(),
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+      avatar: resolveAvatar({ name: adminName || "Super Admin", email: adminEmail, id: "EMP-001" }),
     };
 
     // If live Firebase is configured, create Auth user and Firestore docs

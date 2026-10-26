@@ -1,6 +1,7 @@
 import { auth, db, isLiveFirebaseConfigured } from "@/lib/firebase/client";
 import { ROLES, normalizeRole } from "@/lib/constants";
 import { employeeService } from "./employeeService";
+import { CORE_PERSONA_AVATARS, resolveAvatar, getIllustratedAvatar } from "@/lib/avatarSystem";
 
 export const DEMO_USERS = [
   {
@@ -13,7 +14,7 @@ export const DEMO_USERS = [
     jobTitle: "Super Administrator",
     department: "Executive",
     mustChangePassword: false,
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+    avatar: CORE_PERSONA_AVATARS["admin@hcmlite.internal"],
   },
   {
     uid: "demo-hr",
@@ -25,7 +26,7 @@ export const DEMO_USERS = [
     jobTitle: "Senior HR Business Partner",
     department: "Human Resources",
     mustChangePassword: false,
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+    avatar: CORE_PERSONA_AVATARS["hr@hcmlite.internal"],
   },
   {
     uid: "demo-employee",
@@ -37,7 +38,7 @@ export const DEMO_USERS = [
     jobTitle: "Staff Software Engineer",
     department: "Engineering",
     mustChangePassword: false,
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    avatar: CORE_PERSONA_AVATARS["employee@hcmlite.internal"],
   },
   {
     uid: "demo-temp-user",
@@ -49,7 +50,7 @@ export const DEMO_USERS = [
     jobTitle: "New Hire (Temp Password)",
     department: "Engineering",
     mustChangePassword: true,
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+    avatar: CORE_PERSONA_AVATARS["new.hire@hcmlite.internal"],
   },
 ];
 
@@ -101,10 +102,18 @@ export const authService = {
         const assignedDept = existingEmp?.department || department || "General";
         const assignedTitle = existingEmp?.jobTitle || jobTitle || "Team Member";
 
+        const cleanDisplayName = displayName || existingEmp?.name || email.split("@")[0];
+        const assignedAvatar = resolveAvatar({
+          src: existingEmp?.avatar,
+          name: cleanDisplayName,
+          email: cred.user.email,
+          id: employeeId,
+        });
+
         const userProfile = {
           uid: cred.user.uid,
           email: cred.user.email,
-          displayName: displayName || existingEmp?.name || email.split("@")[0],
+          displayName: cleanDisplayName,
           role: assignedRole,
           employeeId,
           jobTitle: assignedTitle,
@@ -112,7 +121,7 @@ export const authService = {
           mustChangePassword: false,
           status: "Active",
           createdAt: new Date().toISOString(),
-          avatar: `https://images.unsplash.com/photo-${1530000000000 + Math.floor(Math.random() * 50000000)}?w=150&auto=format&fit=crop&q=80`,
+          avatar: assignedAvatar,
         };
 
         // Persist profile to Cloud Firestore
@@ -157,16 +166,17 @@ export const authService = {
     // Demo / Offline Fallback Mode
     const newId = `usr_${Date.now()}`;
     const newEmployeeId = `EMP-${String(Math.floor(Math.random() * 900) + 100)}`;
+    const resolvedName = displayName || email.split("@")[0];
     const localUser = {
       uid: newId,
       email,
-      displayName: displayName || email.split("@")[0],
+      displayName: resolvedName,
       role: role || ROLES.ADMIN,
       employeeId: newEmployeeId,
       jobTitle: jobTitle || "Team Member",
       department: department || "General",
       mustChangePassword: false,
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      avatar: resolveAvatar({ name: resolvedName, email, id: newEmployeeId }),
     };
 
     if (typeof window !== "undefined") {
@@ -218,16 +228,25 @@ export const authService = {
           (cleanEmail.includes("admin") ? "ADMIN" : cleanEmail.includes("hr") ? "HR" : ROLES.EMPLOYEE)
         );
 
+        const resolvedName = cred.user.displayName || empRecord?.name || profileData?.displayName || cleanEmail.split("@")[0];
+        const resolvedEmpId = profileData?.employeeId || empRecord?.id || "EMP-001";
+        const resolvedAvatar = resolveAvatar({
+          src: empRecord?.avatar || profileData?.avatar || cred.user.photoURL,
+          name: resolvedName,
+          email: cleanEmail,
+          id: resolvedEmpId,
+        });
+
         return {
           uid: cred.user.uid,
           email: cred.user.email,
-          displayName: cred.user.displayName || profileData?.displayName || empRecord?.name || cleanEmail.split("@")[0],
+          displayName: resolvedName,
           role: assignedRole,
-          employeeId: profileData?.employeeId || empRecord?.id || "EMP-001",
+          employeeId: resolvedEmpId,
           jobTitle: profileData?.jobTitle || empRecord?.jobTitle || (assignedRole === "ADMIN" ? "Super Administrator" : "Team Member"),
           department: profileData?.department || empRecord?.department || (assignedRole === "ADMIN" ? "Executive" : "General"),
           mustChangePassword: Boolean(mustChange),
-          avatar: cred.user.photoURL || profileData?.avatar || empRecord?.avatar || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+          avatar: resolvedAvatar,
         };
       } catch (err) {
         // Check if employee exists in directory with temporary password
@@ -305,7 +324,12 @@ export const authService = {
         jobTitle: matchedEmployee.jobTitle || "Team Member",
         department: matchedEmployee.department || "General",
         mustChangePassword: matchedEmployee.mustChangePassword !== false,
-        avatar: matchedEmployee.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+        avatar: resolveAvatar({
+          src: matchedEmployee.avatar,
+          name: matchedEmployee.name,
+          email: matchedEmployee.email,
+          id: matchedEmployee.id,
+        }),
       };
 
       if (typeof window !== "undefined") {

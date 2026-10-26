@@ -1,6 +1,7 @@
 import { isLiveFirebaseConfigured, db } from "@/lib/firebase/client";
 import { INITIAL_EMPLOYEES } from "@/lib/seedData";
 import { generateId } from "@/lib/utils";
+import { resolveAvatar } from "@/lib/avatarSystem";
 
 const STORAGE_KEY = "hcm_lite_employees";
 
@@ -141,15 +142,22 @@ export const employeeService = {
     const tempPassword = data.temporaryPassword || `HCM-${Math.random().toString(36).substring(2, 8).toUpperCase()}!`;
     const cleanEmail = (data.email || "").trim().toLowerCase();
 
+    const empName = `${data.firstName || ""} ${data.lastName || ""}`.trim() || data.name || "Unnamed Employee";
+    const assignedAvatar = resolveAvatar({
+      src: data.avatar,
+      name: empName,
+      email: cleanEmail,
+      id: newId,
+      gender: data.gender,
+    });
+
     const newEmp = {
       id: newId,
-      name: `${data.firstName || ""} ${data.lastName || ""}`.trim() || data.name || "Unnamed Employee",
+      name: empName,
       email: cleanEmail,
       status: "Pending Activation",
       hireDate: data.hireDate || new Date().toISOString().split("T")[0],
-      avatar:
-        data.avatar ||
-        `https://images.unsplash.com/photo-${1530000000000 + Math.floor(Math.random() * 50000000)}?w=150&auto=format&fit=crop&q=80`,
+      avatar: assignedAvatar,
       currency: "USD",
       temporaryPassword: tempPassword,
       mustChangePassword: true,
@@ -188,7 +196,7 @@ export const employeeService = {
       // 2. Persist record to Cloud Firestore
       try {
         const { doc, setDoc } = await import("firebase/firestore");
-        const recordToSave = { ...newEmp, uid: authUid };
+        const recordToSave = { ...newEmp, uid: authUid, avatar: assignedAvatar };
 
         await setDoc(doc(db, "employees", newId), recordToSave);
         if (authUid !== newId) {
@@ -206,6 +214,7 @@ export const employeeService = {
           mustChangePassword: true,
           temporaryPassword: tempPassword,
           status: "Pending Activation",
+          avatar: assignedAvatar,
           createdAt: new Date().toISOString(),
         });
 

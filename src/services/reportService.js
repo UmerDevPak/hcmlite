@@ -3,6 +3,7 @@ import { leaveService } from "./leaveService";
 import { payrollService } from "./payrollService";
 import { attendanceService } from "./attendanceService";
 import { setupService } from "./setupService";
+import { CORE_PERSONA_AVATARS } from "@/lib/avatarSystem";
 
 // In-memory cache for ultra-fast tab switching with zero lag
 const reportCache = new Map();
@@ -244,7 +245,7 @@ export const reportService = {
         department: "Engineering",
         lateCount: 4,
         avgCheckIn: "09:28 AM",
-        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+        avatar: CORE_PERSONA_AVATARS["EMP-009"],
       },
       {
         id: "EMP-006",
@@ -253,7 +254,7 @@ export const reportService = {
         department: "Design",
         lateCount: 3,
         avgCheckIn: "09:24 AM",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+        avatar: CORE_PERSONA_AVATARS["EMP-006"],
       },
       {
         id: "EMP-002",
@@ -262,7 +263,7 @@ export const reportService = {
         department: "Engineering",
         lateCount: 2,
         avgCheckIn: "09:21 AM",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+        avatar: CORE_PERSONA_AVATARS["EMP-002"],
       },
       {
         id: "EMP-008",
@@ -271,7 +272,7 @@ export const reportService = {
         department: "Sales",
         lateCount: 2,
         avgCheckIn: "09:19 AM",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+        avatar: CORE_PERSONA_AVATARS["EMP-008"],
       },
       {
         id: "EMP-005",
@@ -280,7 +281,7 @@ export const reportService = {
         department: "Human Resources",
         lateCount: 1,
         avgCheckIn: "09:17 AM",
-        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+        avatar: CORE_PERSONA_AVATARS["EMP-005"],
       },
     ];
 

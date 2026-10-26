@@ -201,7 +201,7 @@ export default function EmployeeDashboardPage() {
 
         <div className="relative z-10 flex items-center gap-4">
           <Avatar
-            src={user?.photoURL || employee.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"}
+            src={user?.photoURL || employee.avatar}
             name={user?.displayName || employee.name || "Elena Rostova"}
             size="lg"
             className="ring-2 ring-indigo-500/40"
@@ -601,7 +601,7 @@ export default function EmployeeDashboardPage() {
               {leaveRequests.length === 0 ? (
                 <EmptyState
                   compact
-                  avatarUrl={user?.photoURL || employee.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"}
+                  avatarUrl={user?.photoURL || employee.avatar}
                   title="Oops! There is nothing to see here"
                   description="You have no pending or active leave requests. Your PTO balance is intact and ready whenever you need time off."
                   actionLabel="Apply for Leave"

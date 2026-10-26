@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Sparkles, ArrowRight, FolderOpen } from "lucide-react";
 import { Button } from "./Button";
 import { cn } from "@/lib/utils";
+import { resolveAvatar, ANONYMOUS_DATA_URIS } from "@/lib/avatarSystem";
 
 export function EmptyState({
   icon: Icon,
@@ -17,6 +18,11 @@ export function EmptyState({
   compact = false,
   className = "",
 }) {
+  const effectiveAvatar = useMemo(() => {
+    if (avatarUrl) return resolveAvatar(avatarUrl);
+    if (!Icon) return ANONYMOUS_DATA_URIS[0];
+    return null;
+  }, [avatarUrl, Icon]);
   return (
     <div
       className={cn(
@@ -42,9 +48,9 @@ export function EmptyState({
         {/* Ambient Ring Glow */}
         <div className="absolute -inset-2 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-md" />
 
-        {avatarUrl ? (
+        {effectiveAvatar ? (
           <div className="relative w-16 h-16 rounded-full ring-4 ring-indigo-500/20 shadow-elevated overflow-hidden bg-zinc-800">
-            <img src={avatarUrl} alt="Empty state avatar" className="w-full h-full object-cover" />
+            <img src={effectiveAvatar} alt="Empty state avatar" className="w-full h-full object-cover" />
             <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-emerald-500 ring-2 ring-zinc-900 flex items-center justify-center text-[10px] text-white">
               ✓
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -8,11 +8,14 @@ import { Button } from "@/components/ui/Button";
 import { DEPARTMENTS, ROLES, EMPLOYMENT_TYPE, ROLE_LABELS } from "@/lib/constants";
 import { employeeService } from "@/services/employeeService";
 import { useNotification } from "@/context/NotificationContext";
+import { ALL_AVATAR_PRESETS, resolveAvatar } from "@/lib/avatarSystem";
+import { cn } from "@/lib/utils";
 
 export function EmployeeModal({ isOpen, onClose, employee = null, onSaved }) {
   const { notifySuccess, notifyError } = useNotification();
   const [loading, setLoading] = useState(false);
   const [createdCredentials, setCreatedCredentials] = useState(null);
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -32,9 +35,15 @@ export function EmployeeModal({ isOpen, onClose, employee = null, onSaved }) {
     emergencyPhone: "",
   });
 
+  const autoAvatar = useMemo(() => {
+    const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+    return resolveAvatar({ name: fullName, email: formData.email, id: employee?.id });
+  }, [formData.firstName, formData.lastName, formData.email, employee]);
+
   useEffect(() => {
     setCreatedCredentials(null);
     if (employee) {
+      setSelectedAvatar(employee.avatar || null);
       const names = (employee.name || "").split(" ");
       setFormData({
         firstName: employee.firstName || names[0] || "",
@@ -54,6 +63,7 @@ export function EmployeeModal({ isOpen, onClose, employee = null, onSaved }) {
         emergencyPhone: employee.emergencyContact?.phone || "",
       });
     } else {
+      setSelectedAvatar(null);
       setFormData({
         firstName: "",
         lastName: "",
@@ -80,6 +90,7 @@ export function EmployeeModal({ isOpen, onClose, employee = null, onSaved }) {
 
     const payload = {
       ...formData,
+      avatar: selectedAvatar || autoAvatar,
       annualSalary: Number(formData.annualSalary),
       emergencyContact: {
         name: formData.emergencyName,
@@ -182,6 +193,49 @@ export function EmployeeModal({ isOpen, onClose, employee = null, onSaved }) {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Visual Illustrated Vector Avatar Selector */}
+          <div className="p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                Illustrated Vector Avatar
+              </label>
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                {selectedAvatar ? "Custom Choice Active" : "Auto-matched by gender & name"}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2.5 overflow-x-auto pb-1 pt-0.5 scrollbar-thin">
+              {ALL_AVATAR_PRESETS.map((preset) => {
+                const isSelected = selectedAvatar === preset.dataUri || (!selectedAvatar && autoAvatar === preset.dataUri);
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => setSelectedAvatar(preset.dataUri)}
+                    title={preset.label}
+                    className={cn(
+                      "relative shrink-0 w-9 h-9 rounded-full transition-all p-0.5",
+                      isSelected
+                        ? "ring-2 ring-indigo-500 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950 scale-110 shadow-md"
+                        : "opacity-60 hover:opacity-100 hover:scale-105"
+                    )}
+                  >
+                    <img src={preset.dataUri} alt={preset.label} className="w-full h-full rounded-full object-cover" />
+                  </button>
+                );
+              })}
+              {selectedAvatar && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedAvatar(null)}
+                  className="text-[11px] text-zinc-400 hover:text-indigo-400 underline shrink-0 pl-1"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="First Name"

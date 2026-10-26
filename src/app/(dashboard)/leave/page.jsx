@@ -146,7 +146,6 @@ export default function LeavePage() {
           {filteredRequests.length === 0 ? (
             <div className="p-8 sm:p-12">
               <EmptyState
-                avatarUrl="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
                 title="Oops! There is nothing to see here"
                 description={
                   activeTab === "PENDING"

@@ -3,39 +3,29 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { getInitials, cn } from "@/lib/utils";
 import { User } from "lucide-react";
-
-const GRADIENT_PALETTES = [
-  "from-indigo-500 to-purple-600 text-white",
-  "from-blue-500 to-indigo-600 text-white",
-  "from-emerald-500 to-teal-600 text-white",
-  "from-violet-500 to-fuchsia-600 text-white",
-  "from-rose-500 to-pink-600 text-white",
-  "from-amber-500 to-orange-600 text-white",
-  "from-cyan-500 to-blue-600 text-white",
-];
-
-function getGradientForName(name = "") {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % GRADIENT_PALETTES.length;
-  return GRADIENT_PALETTES[index];
-}
+import { resolveAvatar } from "@/lib/avatarSystem";
 
 export function Avatar({
   src,
   name = "User",
+  id,
+  email,
+  gender,
   size = "md",
   className = "",
   shape = "circle",
 }) {
   const [imageError, setImageError] = useState(false);
 
-  // Reset image error state whenever src prop updates
+  // Automatically resolve to illustrated vector avatar matching gender & persona
+  const effectiveSrc = useMemo(() => {
+    return resolveAvatar({ src, name, id, email, gender });
+  }, [src, name, id, email, gender]);
+
+  // Reset image error state whenever effectiveSrc updates
   useEffect(() => {
     setImageError(false);
-  }, [src]);
+  }, [effectiveSrc]);
 
   const sizes = {
     xs: "w-6 h-6 text-[10px]",
@@ -53,32 +43,29 @@ export function Avatar({
   };
 
   const initials = getInitials(name);
-  const gradient = useMemo(() => getGradientForName(name), [name]);
-
-  const isImageValid = Boolean(src && !imageError && String(src).trim() !== "");
+  const isImageValid = Boolean(effectiveSrc && !imageError && String(effectiveSrc).trim() !== "");
 
   return (
     <div
       className={cn(
-        "relative shrink-0 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm select-none transition-transform",
+        "relative shrink-0 flex items-center justify-center overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm select-none transition-transform bg-zinc-100 dark:bg-zinc-800",
         sizes[size] || sizes.md,
         shapes[shape] || shapes.circle,
-        !isImageValid && `bg-gradient-to-br ${gradient}`,
         className
       )}
     >
       {isImageValid ? (
         <img
-          src={src}
+          src={effectiveSrc}
           alt={name}
           className="w-full h-full object-cover"
           onError={() => setImageError(true)}
           loading="lazy"
         />
       ) : initials ? (
-        <span className="font-bold tracking-tight drop-shadow-sm">{initials}</span>
+        <span className="font-bold tracking-tight drop-shadow-sm text-zinc-700 dark:text-zinc-200">{initials}</span>
       ) : (
-        <User className="w-1/2 h-1/2 text-white/90" />
+        <User className="w-1/2 h-1/2 text-zinc-400" />
       )}
     </div>
   );

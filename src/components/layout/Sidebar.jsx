@@ -261,6 +261,8 @@ export function Sidebar({ isOpen, onClose }) {
                 <Avatar
                   src={user?.avatar || user?.photoURL}
                   name={user?.displayName || "Admin"}
+                  id={user?.employeeId}
+                  email={user?.email}
                   size="sm"
                 />
                 <div className="flex-1 min-w-0">

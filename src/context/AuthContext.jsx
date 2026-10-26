@@ -5,6 +5,7 @@ import { auth, isLiveFirebaseConfigured } from "@/lib/firebase/client";
 import { DEMO_USERS, findDemoUser, authService } from "@/services/authService";
 import { employeeService } from "@/services/employeeService";
 import { ROLES, normalizeRole } from "@/lib/constants";
+import { resolveAvatar } from "@/lib/avatarSystem";
 
 const AuthContext = createContext({
   user: null,
@@ -43,34 +44,38 @@ export function AuthProvider({ children }) {
               (firebaseUser.email?.toLowerCase().includes("admin") ? "ADMIN" : ROLES.EMPLOYEE);
             const activeRole = normalizeRole(rawRole);
 
-            const avatarFallback =
-              firebaseUser.photoURL ||
-              profile?.avatar ||
-              empRecord?.avatar ||
-              demoMatch?.avatar ||
-              "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80";
+            const activeDisplayName =
+              empRecord?.name ||
+              profile?.displayName ||
+              firebaseUser.displayName ||
+              demoMatch?.displayName ||
+              (activeRole === "ADMIN" ? "Sarah Connor" : "User");
+
+            const activeEmployeeId = profile?.employeeId || empRecord?.id || demoMatch?.employeeId || "EMP-001";
+
+            const effectiveAvatar = resolveAvatar({
+              src: empRecord?.avatar || profile?.avatar || firebaseUser.photoURL || demoMatch?.avatar,
+              name: activeDisplayName,
+              email: firebaseUser.email,
+              id: activeEmployeeId,
+            });
 
             const userObj = {
               uid: firebaseUser.uid,
               email: firebaseUser.email,
-              displayName:
-                firebaseUser.displayName ||
-                profile?.displayName ||
-                empRecord?.name ||
-                demoMatch?.displayName ||
-                (activeRole === "ADMIN" ? "Sarah Connor" : "User"),
-              photoURL: avatarFallback,
-              avatar: avatarFallback,
+              displayName: activeDisplayName,
+              photoURL: effectiveAvatar,
+              avatar: effectiveAvatar,
               role: activeRole,
-              employeeId: profile?.employeeId || empRecord?.id || demoMatch?.employeeId || "EMP-001",
+              employeeId: activeEmployeeId,
               jobTitle:
-                profile?.jobTitle ||
                 empRecord?.jobTitle ||
+                profile?.jobTitle ||
                 demoMatch?.jobTitle ||
                 (activeRole === "ADMIN" ? "Super Administrator" : "Team Member"),
               department:
-                profile?.department ||
                 empRecord?.department ||
+                profile?.department ||
                 demoMatch?.department ||
                 (activeRole === "ADMIN" ? "Executive" : "General"),
               mustChangePassword: Boolean(profile?.mustChangePassword || empRecord?.mustChangePassword),
@@ -121,7 +126,13 @@ export function AuthProvider({ children }) {
 
       if (matched) {
         const canonical = normalizeRole(matched.role);
-        setUser({ ...matched, role: canonical });
+        const resolved = resolveAvatar({
+          src: matched.avatar,
+          name: matched.displayName,
+          email: matched.email,
+          id: matched.employeeId,
+        });
+        setUser({ ...matched, avatar: resolved, photoURL: resolved, role: canonical });
         setRole(canonical);
       } else {
         setUser(null);
@@ -156,7 +167,13 @@ export function AuthProvider({ children }) {
 
     const matched = DEMO_USERS.find((u) => normalizeRole(u.role) === canonical) || DEMO_USERS[0];
     const userRole = normalizeRole(matched.role);
-    setUser({ ...matched, role: userRole });
+    const resolved = resolveAvatar({
+      src: matched.avatar,
+      name: matched.displayName,
+      email: matched.email,
+      id: matched.employeeId,
+    });
+    setUser({ ...matched, avatar: resolved, photoURL: resolved, role: userRole });
     setRole(userRole);
     if (typeof window !== "undefined") {
       localStorage.setItem("hcm_lite_demo_user_uid", matched.uid);
