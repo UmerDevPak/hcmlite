@@ -345,14 +345,17 @@ export const reportService = {
     const latesThisMonth = 1;
     const lateThreshold = 3;
 
-    // 5. Monthly Attendance Calendar (31 days)
+    // 5. Monthly Attendance Calendar
     const calendarDays = [];
-    const daysInMonth = 31;
-    const currentDay = 25;
+    const todayObj = new Date();
+    const currentDay = todayObj.getDate();
+    const currentMonth = todayObj.getMonth();
+    const currentYear = todayObj.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = `2026-10-${String(day).padStart(2, "0")}`;
-      const dateObj = new Date(2026, 9, day);
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      const dateObj = new Date(currentYear, currentMonth, day);
       const dayOfWeekNum = dateObj.getDay();
       const isWeekend = dayOfWeekNum === 0 || dayOfWeekNum === 6;
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminAuth } from "@/lib/firebase/admin";
-import { ROLES } from "@/lib/constants";
+import { ROLES, normalizeRole } from "@/lib/constants";
 
 /**
  * PROJECT_SPEC.md Rule 1:
@@ -38,8 +38,9 @@ export async function verifyServerRole(request, allowedRoles = [ROLES.ADMIN, ROL
 
   // 3. Header check for client session / demo role
   if (headerRole) {
-    const normalized = headerRole.toUpperCase() === "SUPER_ADMIN" ? ROLES.ADMIN : headerRole;
-    if (allowedRoles.includes(normalized) || allowedRoles.includes(headerRole)) {
+    const normalized = normalizeRole(headerRole);
+    const normalizedAllowed = allowedRoles.map((r) => normalizeRole(r));
+    if (normalizedAllowed.includes(normalized)) {
       return { authorized: true, role: normalized };
     }
     return {

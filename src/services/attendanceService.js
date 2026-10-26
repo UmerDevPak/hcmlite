@@ -43,7 +43,7 @@ export const attendanceService = {
     if (isLiveFirebaseConfigured && db) {
       try {
         const { collection, getDocs, query, where } = await import("firebase/firestore");
-        const q = query(collection(db, "attendance"), where("date", "in", [today, "2026-10-24"]));
+        const q = query(collection(db, "attendance"));
         const snap = await getDocs(q);
         if (!snap.empty) {
           const remoteRecords = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -62,15 +62,22 @@ export const attendanceService = {
       }
     }
 
-    const filtered = records.filter((r) => r.date === today || r.date === "2026-10-24");
+    // Filter today's records; if empty, include recent mock records for demonstration
+    let filtered = records.filter((r) => r.date === today);
+    if (filtered.length === 0) {
+      filtered = records.filter((r) => r.date === "2026-10-24" || r.date === today);
+    }
+
     memoryRecordsCache = filtered;
     lastRecordsFetchTime = now;
     return filtered;
   },
 
   async getEmployeeTodayRecord(employeeId) {
-    const todayRecords = await this.getTodayRecords();
-    return todayRecords.find((r) => r.employeeId === employeeId) || null;
+    const today = new Date().toISOString().split("T")[0];
+    const records = getLocalAttendance();
+    // Prioritize today's record for this employee
+    return records.find((r) => r.employeeId === employeeId && r.date === today) || null;
   },
 
   /**
@@ -85,7 +92,7 @@ export const attendanceService = {
     const nowStr = formatTime(now);
 
     const existing = records.find(
-      (r) => r.employeeId === employeeId && (r.date === today || r.date === "2026-10-24")
+      (r) => r.employeeId === employeeId && r.date === today
     );
 
     // Rule 4: Prevent duplicate check-in with 409
@@ -160,7 +167,7 @@ export const attendanceService = {
     const nowStr = formatTime(now);
 
     const index = records.findIndex(
-      (r) => r.employeeId === employeeId && (r.date === today || r.date === "2026-10-24")
+      (r) => r.employeeId === employeeId && r.date === today
     );
 
     if (index !== -1) {

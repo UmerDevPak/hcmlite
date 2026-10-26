@@ -78,7 +78,8 @@ export default function EmployeeDashboardPage() {
       setMetrics(data);
       setTodayPunch(data.todayPunch);
       // Default selected calendar day to today or the last active working day
-      const todayCell = data.calendarDays.find((d) => d.day === 25) || data.calendarDays[0];
+      const currentDay = new Date().getDate();
+      const todayCell = data.calendarDays.find((d) => d.day === currentDay) || data.calendarDays[0];
       setSelectedCalendarDay(todayCell);
     } catch (err) {
       console.warn("[EmployeeDashboard] Error loading data:", err);
