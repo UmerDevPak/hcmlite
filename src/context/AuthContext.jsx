@@ -21,21 +21,64 @@ const AuthContext = createContext({
 });
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState(ROLES.ADMIN);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("hcm_lite_cached_session");
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return null;
+  });
+
+  const [role, setRole] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("hcm_lite_cached_session");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed?.role) return normalizeRole(parsed.role);
+        }
+      } catch (e) {}
+    }
+    return ROLES.ADMIN;
+  });
+
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("hcm_lite_cached_session");
+        if (cached) return false;
+      } catch (e) {}
+    }
+    return true;
+  });
+
+  // Safety timeout: Ensure page loading never hangs on slow network / cold start
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (isLiveFirebaseConfigured && auth) {
       const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
         if (firebaseUser) {
           try {
-            // Fetch Cloud Firestore profile or match predefined persona
-            const profile = await authService.getUserProfile(firebaseUser.uid);
+            // Concurrently resolve profile and employee record for maximum speed
+            const [profile, empRecordDirect] = await Promise.all([
+              authService.getUserProfile(firebaseUser.uid).catch(() => null),
+              employeeService.getEmployeeById(firebaseUser.uid).catch(() => null),
+            ]);
+
+            let empRecord = empRecordDirect;
+            if (!empRecord && firebaseUser.email) {
+              empRecord = await employeeService.getEmployeeByEmail(firebaseUser.email).catch(() => null);
+            }
+
             const demoMatch = findDemoUser(firebaseUser.email);
-            const empRecord =
-              (await employeeService.getEmployeeById(firebaseUser.uid)) ||
-              (await employeeService.getEmployeeByEmail(firebaseUser.email));
 
             const rawRole =
               profile?.role ||
@@ -84,6 +127,7 @@ export function AuthProvider({ children }) {
             setUser(userObj);
             setRole(activeRole);
             if (typeof window !== "undefined") {
+              localStorage.setItem("hcm_lite_cached_session", JSON.stringify(userObj));
               localStorage.setItem("hcm_lite_demo_user_uid", firebaseUser.uid);
               localStorage.removeItem("hcm_lite_logged_out");
             }
@@ -93,6 +137,9 @@ export function AuthProvider({ children }) {
         } else {
           setUser(null);
           setRole(null);
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("hcm_lite_cached_session");
+          }
         }
         setLoading(false);
       });
@@ -222,6 +269,7 @@ export function AuthProvider({ children }) {
     try {
       await authService.signOut();
       if (typeof window !== "undefined") {
+        localStorage.removeItem("hcm_lite_cached_session");
         localStorage.removeItem("hcm_lite_demo_user_uid");
         localStorage.setItem("hcm_lite_logged_out", "true");
       }

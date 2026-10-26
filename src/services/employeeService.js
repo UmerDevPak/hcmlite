@@ -43,7 +43,10 @@ export const employeeService = {
       if (isLiveFirebaseConfigured && db) {
         try {
           const { collection, getDocs } = await import("firebase/firestore");
-          const snapshot = await getDocs(collection(db, "employees"));
+          const snapshot = await Promise.race([
+            getDocs(collection(db, "employees")),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1400)),
+          ]);
           if (!snapshot.empty) {
             const remoteList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
             remoteList.forEach((rem) => {

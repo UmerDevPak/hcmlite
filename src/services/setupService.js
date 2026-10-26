@@ -11,12 +11,24 @@ export const setupService = {
    * If empty, returns false indicating first-run setup is required.
    */
   async checkIsCompanyInitialized() {
+    if (typeof window !== "undefined") {
+      const cached = sessionStorage.getItem("hcm_company_initialized");
+      if (cached === "true") return true;
+    }
+
     if (isLiveFirebaseConfigured && db) {
       try {
         const { collection, getDocs, limit, query } = await import("firebase/firestore");
         const q = query(collection(db, "company_settings"), limit(1));
-        const snap = await getDocs(q);
-        return !snap.empty;
+        const snap = await Promise.race([
+          getDocs(q),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1200)),
+        ]);
+        const initialized = !snap.empty;
+        if (initialized && typeof window !== "undefined") {
+          sessionStorage.setItem("hcm_company_initialized", "true");
+        }
+        return initialized;
       } catch (err) {
         console.warn("[setupService] Firestore check fallback:", err.message);
       }

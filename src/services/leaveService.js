@@ -139,7 +139,10 @@ export const leaveService = {
       if (isLiveFirebaseConfigured && db) {
         try {
           const { collection, getDocs } = await import("firebase/firestore");
-          const snap = await getDocs(collection(db, "leave_requests"));
+          const snap = await Promise.race([
+            getDocs(collection(db, "leave_requests")),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1400)),
+          ]);
           if (!snap.empty) {
             const remoteList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
             // Merge with local list by id

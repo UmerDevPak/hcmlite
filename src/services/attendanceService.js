@@ -44,7 +44,10 @@ export const attendanceService = {
       try {
         const { collection, getDocs, query, where } = await import("firebase/firestore");
         const q = query(collection(db, "attendance"));
-        const snap = await getDocs(q);
+        const snap = await Promise.race([
+          getDocs(q),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1400)),
+        ]);
         if (!snap.empty) {
           const remoteRecords = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
           // Merge remote records with local records
