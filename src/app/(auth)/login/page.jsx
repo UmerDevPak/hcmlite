@@ -8,12 +8,12 @@ import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { DEMO_USERS } from "@/services/authService";
+import { DEMO_USERS, authService } from "@/services/authService";
 import { normalizeRole, ROLE_LABELS } from "@/lib/constants";
 import { setupService } from "@/services/setupService";
 import { employeeService } from "@/services/employeeService";
 import { ForcePasswordChangeModal } from "@/components/auth/ForcePasswordChangeModal";
-import { isLiveFirebaseConfigured } from "@/lib/firebase/client";
+import { auth, isLiveFirebaseConfigured } from "@/lib/firebase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -74,7 +74,44 @@ export default function LoginPage() {
         return;
       }
 
-      const roleLabel = ROLE_LABELS[normalizeRole(authUser?.role || selectedRole)] || "Employee";
+      // CRITICAL STRICT ROLE ENFORCEMENT:
+      // The authenticated account's actual role MUST match the selected role.
+      // HR cannot log in as Admin, Admin cannot log in as HR, Employee cannot log in as Admin/HR.
+      const authenticatedRole = normalizeRole(authUser?.role);
+      const targetRole = normalizeRole(selectedRole);
+
+      if (authenticatedRole !== targetRole) {
+        // Revoke session immediately to prevent unauthorized access
+        try {
+          if (auth) {
+            const { signOut: fbSignOut } = await import("firebase/auth");
+            await fbSignOut(auth);
+          }
+        } catch (e) {}
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("hcm_lite_cached_session");
+          localStorage.removeItem("hcm_lite_demo_user_uid");
+          localStorage.setItem("hcm_lite_logged_out", "true");
+          sessionStorage.removeItem("hcm_role_login_popup");
+          sessionStorage.removeItem("hcm_role_login_flash");
+        }
+
+        const roleNames = {
+          ADMIN: "Administrator",
+          HR: "Human Resources (HR)",
+          EMPLOYEE: "Employee",
+        };
+        const targetName = roleNames[targetRole] || targetRole;
+        const actualName = roleNames[authenticatedRole] || authenticatedRole;
+
+        const mismatchMsg = `Access Denied: You selected "${targetName}", but this account is registered as "${actualName}". An ${actualName} account cannot log in as ${targetName}.`;
+        setLoginError(mismatchMsg);
+        notifyError("Role Mismatch", mismatchMsg);
+        setLoading(false);
+        return;
+      }
+
+      const roleLabel = ROLE_LABELS[authenticatedRole] || "Employee";
       const loginMsg = `Logged in successfully as ${roleLabel}`;
       try {
         sessionStorage.setItem(
@@ -93,7 +130,7 @@ export default function LoginPage() {
       } catch (e) {}
       notifySuccess("Authentication Success", loginMsg);
 
-      const dest = getRoleDashboard(authUser?.role);
+      const dest = getRoleDashboard(authenticatedRole);
       router.push(dest);
     } catch (err) {
       let rawMsg = (err.message || "").toLowerCase();
@@ -128,6 +165,7 @@ export default function LoginPage() {
 
     try {
       const canonical = normalizeRole(demoUser.role);
+      setSelectedRole(canonical);
       const roleLabel = ROLE_LABELS[canonical] || "Employee";
       const loginMsg = `Logged in successfully as ${roleLabel}`;
 

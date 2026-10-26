@@ -98,7 +98,7 @@ export const authService = {
         // Check if employee record already exists in directory to link
         const existingEmp = await employeeService.getEmployeeByEmail(email);
         const employeeId = existingEmp?.id || `EMP-${String(Math.floor(Math.random() * 900) + 100)}`;
-        const assignedRole = existingEmp?.role || role || ROLES.ADMIN;
+        const assignedRole = existingEmp?.role || role || ROLES.EMPLOYEE;
         const assignedDept = existingEmp?.department || department || "General";
         const assignedTitle = existingEmp?.jobTitle || jobTitle || "Team Member";
 
@@ -171,7 +171,7 @@ export const authService = {
       uid: newId,
       email,
       displayName: resolvedName,
-      role: role || ROLES.ADMIN,
+      role: role || ROLES.EMPLOYEE,
       employeeId: newEmployeeId,
       jobTitle: jobTitle || "Team Member",
       department: department || "General",
@@ -222,11 +222,17 @@ export const authService = {
         const empRecord = await employeeService.getEmployeeById(cred.user.uid) || await employeeService.getEmployeeByEmail(cleanEmail);
         const mustChange = profileData?.mustChangePassword || empRecord?.mustChangePassword || false;
 
-        const assignedRole = normalizeRole(
-          profileData?.role ||
-          empRecord?.role ||
-          (cleanEmail.includes("admin") ? "ADMIN" : cleanEmail.includes("hr") ? "HR" : ROLES.EMPLOYEE)
-        );
+        let detectedRole = ROLES.EMPLOYEE;
+        if (profileData?.role) {
+          detectedRole = profileData.role;
+        } else if (empRecord?.role) {
+          detectedRole = empRecord.role;
+        } else if (cleanEmail === "admin@hcmlite.internal" || cleanEmail.startsWith("admin@")) {
+          detectedRole = "ADMIN";
+        } else if (cleanEmail === "hr@hcmlite.internal" || cleanEmail.startsWith("hr@")) {
+          detectedRole = "HR";
+        }
+        const assignedRole = normalizeRole(detectedRole);
 
         const resolvedName = cred.user.displayName || empRecord?.name || profileData?.displayName || cleanEmail.split("@")[0];
         const resolvedEmpId = profileData?.employeeId || empRecord?.id || "EMP-001";

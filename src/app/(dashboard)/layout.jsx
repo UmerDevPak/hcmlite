@@ -14,7 +14,7 @@ export function getRouteAccess(pathname, rawRole) {
   const role = normalizeRole(rawRole);
   const path = pathname || "";
 
-  // 1. Admin-only routes
+  // 1. Admin-only routes: strictly locked to ADMIN
   if (
     path.startsWith("/admin") ||
     path.startsWith("/settings") ||
@@ -24,30 +24,27 @@ export function getRouteAccess(pathname, rawRole) {
     return {
       authorized: false,
       redirectPath: role === "HR" ? "/hr" : "/employee",
-      reason: "Administrator verification required for this portal.",
+      reason: "Administrator verification required. HR and Employees cannot access Admin portals.",
     };
   }
 
-  // 2. HR & Admin routes
-  if (
-    path.startsWith("/hr") ||
-    path.startsWith("/recruitment")
-  ) {
+  // 2. HR portal route: strictly locked to HR
+  if (path.startsWith("/hr")) {
+    if (role === "HR") return { authorized: true };
+    return {
+      authorized: false,
+      redirectPath: role === "ADMIN" ? "/admin" : "/employee",
+      reason: "Human Resources verification required. Dedicated to HR accounts.",
+    };
+  }
+
+  // 3. Recruitment & Payroll routes: Admin & HR authorized
+  if (path.startsWith("/recruitment") || path.startsWith("/payroll")) {
     if (role === "ADMIN" || role === "HR") return { authorized: true };
     return {
       authorized: false,
       redirectPath: "/employee",
-      reason: "Human Resources verification required for this portal.",
-    };
-  }
-
-  // 3. Payroll route (Admin & HR only)
-  if (path.startsWith("/payroll")) {
-    if (role === "ADMIN" || role === "HR") return { authorized: true };
-    return {
-      authorized: false,
-      redirectPath: "/employee",
-      reason: "Payroll processing is restricted to HR and Administrators.",
+      reason: "Access restricted to HR and Administrators.",
     };
   }
 

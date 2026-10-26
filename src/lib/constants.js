@@ -12,7 +12,7 @@ export const ROLES = {
 };
 
 export function normalizeRole(role) {
-  if (!role) return "ADMIN";
+  if (!role) return "EMPLOYEE";
   const upper = String(role).trim().toUpperCase();
   if (upper === "ADMIN" || upper === "SUPER_ADMIN" || upper === "DEPARTMENT_MANAGER") return "ADMIN";
   if (upper === "HR" || upper === "HR_MANAGER") return "HR";

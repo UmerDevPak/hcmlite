@@ -29,7 +29,7 @@ export default function SignUpPage() {
   const [formData, setFormData] = useState({
     displayName: "",
     email: "",
-    role: ROLES.ADMIN,
+    role: ROLES.EMPLOYEE,
     department: "Engineering",
     jobTitle: "",
     password: "",

@@ -9,7 +9,7 @@ import { resolveAvatar } from "@/lib/avatarSystem";
 
 const AuthContext = createContext({
   user: null,
-  role: ROLES.ADMIN,
+  role: ROLES.EMPLOYEE,
   loading: true,
   signIn: async () => {},
   signUp: async () => {},
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
         }
       } catch (e) {}
     }
-    return ROLES.ADMIN;
+    return ROLES.EMPLOYEE;
   });
 
   const [loading, setLoading] = useState(() => {
@@ -80,19 +80,27 @@ export function AuthProvider({ children }) {
 
             const demoMatch = findDemoUser(firebaseUser.email);
 
-            const rawRole =
-              profile?.role ||
-              empRecord?.role ||
-              demoMatch?.role ||
-              (firebaseUser.email?.toLowerCase().includes("admin") ? "ADMIN" : ROLES.EMPLOYEE);
-            const activeRole = normalizeRole(rawRole);
+            let detectedRole = ROLES.EMPLOYEE;
+            const emailLower = (firebaseUser.email || "").toLowerCase();
+            if (profile?.role) {
+              detectedRole = profile.role;
+            } else if (empRecord?.role) {
+              detectedRole = empRecord.role;
+            } else if (demoMatch?.role) {
+              detectedRole = demoMatch.role;
+            } else if (emailLower === "admin@hcmlite.internal" || emailLower.startsWith("admin@")) {
+              detectedRole = "ADMIN";
+            } else if (emailLower === "hr@hcmlite.internal" || emailLower.startsWith("hr@")) {
+              detectedRole = "HR";
+            }
+            const activeRole = normalizeRole(detectedRole);
 
             const activeDisplayName =
               empRecord?.name ||
               profile?.displayName ||
               firebaseUser.displayName ||
               demoMatch?.displayName ||
-              (activeRole === "ADMIN" ? "Sarah Connor" : "User");
+              (activeRole === "ADMIN" ? "Administrator" : activeRole === "HR" ? "HR Manager" : "Employee");
 
             const activeEmployeeId = profile?.employeeId || empRecord?.id || demoMatch?.employeeId || "EMP-001";
 
@@ -160,15 +168,6 @@ export function AuthProvider({ children }) {
 
       if (!matched && savedUid) {
         matched = DEMO_USERS.find((u) => u.uid === savedUid);
-      }
-
-      // Default initial persona on first visit
-      const isExplicitLoggedOut = typeof window !== "undefined" && localStorage.getItem("hcm_lite_logged_out") === "true";
-      if (!matched && !isExplicitLoggedOut) {
-        matched = DEMO_USERS[0];
-        if (typeof window !== "undefined") {
-          localStorage.setItem("hcm_lite_demo_user_uid", matched.uid);
-        }
       }
 
       if (matched) {
