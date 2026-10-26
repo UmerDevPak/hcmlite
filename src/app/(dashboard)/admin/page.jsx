@@ -214,10 +214,10 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* Right Column: Demographic Stats (Tenure Distribution) */}
-        <Card>
-          <CardHeader className="pb-3">
+        <Card className="h-full flex flex-col justify-between">
+          <CardHeader className="pb-3 flex flex-col items-start gap-1">
             <CardTitle>Workforce Tenure Distribution</CardTitle>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-zinc-400">
               Employee retention and seniority breakdown.
             </p>
           </CardHeader>

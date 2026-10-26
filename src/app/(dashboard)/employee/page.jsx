@@ -250,9 +250,9 @@ export default function EmployeeDashboardPage() {
       </div>
 
       {/* 2. Top Action & Metrics Cards (4 cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
         {/* Card 1: Attendance Action Widget */}
-        <Card className="p-4 flex flex-col justify-between relative overflow-hidden border-indigo-500/30 bg-gradient-to-b from-zinc-900 to-indigo-950/20">
+        <Card className="p-4 flex flex-col justify-between h-full min-h-[220px] relative overflow-hidden border-indigo-500/30 bg-gradient-to-b from-zinc-900 to-indigo-950/20">
           <div>
             <div className="flex items-center justify-between pb-1">
               <span className="text-xs font-medium text-zinc-400">Web Punch Clock</span>
@@ -272,7 +272,7 @@ export default function EmployeeDashboardPage() {
             </p>
           </div>
 
-          <div className="mt-4 pt-2 border-t border-zinc-800">
+          <div className="mt-auto pt-3 border-t border-zinc-800">
             <Button
               className="w-full font-semibold text-xs"
               variant={isClockedIn ? "danger" : "primary"}
@@ -291,7 +291,7 @@ export default function EmployeeDashboardPage() {
         </Card>
 
         {/* Card 2: Weekly Hours Logged */}
-        <Card className="p-4 flex flex-col justify-between">
+        <Card className="p-4 flex flex-col justify-between h-full min-h-[220px]">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-zinc-400">Weekly Hours Logged</span>
@@ -324,13 +324,13 @@ export default function EmployeeDashboardPage() {
             </div>
           </div>
 
-          <div className="text-[11px] text-zinc-500 pt-2 border-t border-zinc-800/80 mt-2">
+          <div className="text-[11px] text-zinc-500 pt-2 border-t border-zinc-800/80 mt-auto">
             Target: 40 hrs/week • Standard shift
           </div>
         </Card>
 
         {/* Card 3: Lates This Month */}
-        <Card className="p-4 flex flex-col justify-between">
+        <Card className="p-4 flex flex-col justify-between h-full min-h-[220px]">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-zinc-400">Lates This Month</span>
@@ -373,13 +373,13 @@ export default function EmployeeDashboardPage() {
             </div>
           </div>
 
-          <div className="text-[10px] text-zinc-500 pt-2 border-t border-zinc-800/80 mt-2">
+          <div className="text-[10px] text-zinc-500 pt-2 border-t border-zinc-800/80 mt-auto">
             Rule 6: 3 lates (&gt; 09:15) = 1 half-day deduction
           </div>
         </Card>
 
         {/* Card 4: Leave Balance Summary */}
-        <Card className="p-4 flex flex-col justify-between">
+        <Card className="p-4 flex flex-col justify-between h-full min-h-[220px]">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-zinc-400">Leave Balance Summary</span>
@@ -416,175 +416,258 @@ export default function EmployeeDashboardPage() {
             </div>
           </div>
 
-          <div className="text-[10px] text-zinc-500 pt-2 border-t border-zinc-800/80 mt-2">
+          <div className="text-[10px] text-zinc-500 pt-2 border-t border-zinc-800/80 mt-auto">
             Rule 5: 14 Annual • 8 Sick • 10 Casual quota
           </div>
         </Card>
       </div>
 
-      {/* 3. Bottom Activity Grid (2 cols + 1 col) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column (lg:col-span-2): Monthly Attendance Calendar & Quick Leave */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Section A: Monthly Attendance Calendar */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
+      {/* 3. Primary Attendance & Compensation Row (Calendar + Payslip) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+        {/* Left Column (lg:col-span-2): Monthly Attendance Calendar */}
+        <Card className="lg:col-span-2 flex flex-col justify-between h-full">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />
+                <span>My Monthly Attendance Calendar</span>
+              </CardTitle>
+              <p className="text-xs text-zinc-400 mt-0.5">
+                Color-coded presence record for October 2026. Click any day to inspect check-in timestamps.
+              </p>
+            </div>
+            <Badge variant="secondary" size="sm" className="font-mono shrink-0">
+              October 2026
+            </Badge>
+          </CardHeader>
+          <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
+            {/* Day-of-week headers */}
+            <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] font-semibold text-zinc-400 pb-1 border-b border-zinc-800">
+              <span>Sun</span>
+              <span>Mon</span>
+              <span>Tue</span>
+              <span>Wed</span>
+              <span>Thu</span>
+              <span>Fri</span>
+              <span>Sat</span>
+            </div>
+
+            {/* Calendar Days Grid */}
+            <div className="grid grid-cols-7 gap-1.5">
+              {calendarDays.map((item) => {
+                const isSelected = selectedCalendarDay?.day === item.day;
+
+                let cellColor = "border-zinc-800 bg-zinc-900/40 text-zinc-400";
+                let dotColor = "bg-zinc-600";
+
+                if (item.status === "Present") {
+                  cellColor = "border-emerald-500/30 bg-emerald-950/20 text-emerald-300 hover:bg-emerald-900/30";
+                  dotColor = "bg-emerald-400";
+                } else if (item.status === "Late") {
+                  cellColor = "border-amber-500/30 bg-amber-950/20 text-amber-300 hover:bg-amber-900/30";
+                  dotColor = "bg-amber-400";
+                } else if (item.status === "Half-Day") {
+                  cellColor = "border-purple-500/30 bg-purple-950/20 text-purple-300 hover:bg-purple-900/30";
+                  dotColor = "bg-purple-400";
+                } else if (item.status === "Leave") {
+                  cellColor = "border-blue-500/30 bg-blue-950/20 text-blue-300 hover:bg-blue-900/30";
+                  dotColor = "bg-blue-400";
+                } else if (item.status === "Absent") {
+                  cellColor = "border-rose-500/30 bg-rose-950/20 text-rose-300 hover:bg-rose-900/30";
+                  dotColor = "bg-rose-400";
+                } else if (item.status === "Weekend") {
+                  cellColor = "border-zinc-900 bg-zinc-950/50 text-zinc-600";
+                  dotColor = "bg-zinc-700";
+                }
+
+                return (
+                  <button
+                    key={item.day}
+                    onClick={() => setSelectedCalendarDay(item)}
+                    className={`relative flex flex-col items-center justify-center p-2 rounded-xl border text-xs font-mono transition-all duration-150 ${cellColor} ${
+                      isSelected ? "ring-2 ring-indigo-500 shadow-glow" : ""
+                    }`}
+                  >
+                    <span className="font-semibold">{item.day}</span>
+                    {!item.isWeekend && item.status !== "Upcoming" && (
+                      <span className={`w-1.5 h-1.5 rounded-full mt-1 ${dotColor}`} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected Day Inspection Drawer */}
+            {selectedCalendarDay && (
+              <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-zinc-100 font-mono">
+                      {selectedCalendarDay.date} ({selectedCalendarDay.dayOfWeek})
+                    </span>
+                    <Badge
+                      variant={
+                        selectedCalendarDay.status === "Present"
+                          ? "success"
+                          : selectedCalendarDay.status === "Late"
+                          ? "warning"
+                          : selectedCalendarDay.status === "Half-Day"
+                          ? "purple"
+                          : selectedCalendarDay.status === "Leave"
+                          ? "info"
+                          : "secondary"
+                      }
+                      size="sm"
+                    >
+                      {selectedCalendarDay.status}
+                    </Badge>
+                  </div>
+                  <p className="text-zinc-400">{selectedCalendarDay.details}</p>
+                </div>
+
+                <div className="flex items-center gap-4 text-[11px] font-mono shrink-0">
+                  <div>
+                    <span className="text-zinc-500 block">Check-In</span>
+                    <span className="text-zinc-200 font-semibold">
+                      {selectedCalendarDay.clockIn || "--:--"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-500 block">Check-Out</span>
+                    <span className="text-zinc-200 font-semibold">
+                      {selectedCalendarDay.clockOut || "--:--"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-500 block">Duration</span>
+                    <span className="text-indigo-400 font-semibold">
+                      {selectedCalendarDay.totalHours || "--"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Color Legend */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-800 text-[11px] text-zinc-400 mt-auto">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <span>Present</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                <span>Late (&gt;09:15)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+                <span>Half-Day (&lt;5h)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                <span>Leave</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                <span>Absent</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
+                <span>Weekend</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Right Column (lg:col-span-1): Latest Payslip Card */}
+        <Card className="lg:col-span-1 flex flex-col justify-between h-full border-indigo-500/20 bg-gradient-to-b from-zinc-900 via-zinc-900 to-indigo-950/20">
+          <CardHeader className="flex flex-col items-start gap-1 pb-3">
+            <div className="flex items-center justify-between w-full">
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-indigo-400 shrink-0" />
+                <span>Latest Payslip</span>
+              </CardTitle>
+              <Badge variant="success" size="sm" className="shrink-0">
+                Disbursed
+              </Badge>
+            </div>
+            <p className="text-xs text-zinc-400">
+              {latestPayslip?.period || "Oct 01, 2026 - Oct 15, 2026"}
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800 space-y-3">
+              <div className="flex items-baseline justify-between">
+                <span className="text-xs text-zinc-400">Net Take-Home Pay</span>
+                <span className="text-2xl font-bold font-mono text-emerald-400">
+                  {formatCurrency(latestPayslip?.netPay || 4390)}
+                </span>
+              </div>
+
+              <div className="space-y-1.5 text-xs pt-2 border-t border-zinc-800/80">
+                <div className="flex justify-between text-zinc-400">
+                  <span>Gross Earnings (Basic × 1.5)</span>
+                  <span className="font-mono text-zinc-200">
+                    {formatCurrency(latestPayslip?.totalGross || 6041.67)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-zinc-400">
+                  <span>Tax Slabs & Withholding</span>
+                  <span className="font-mono text-rose-400">
+                    -{formatCurrency(latestPayslip?.totalTaxes || 1313.22)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-zinc-400">
+                  <span>Attendance Deductions</span>
+                  <span className="font-mono text-rose-400">
+                    -{formatCurrency(latestPayslip?.attendanceDeduction || 0)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Instant Action Buttons & Link pinned at bottom */}
+            <div className="mt-auto space-y-2 pt-2">
+              <Button
+                className="w-full text-xs font-semibold"
+                icon={Download}
+                onClick={handleDownloadPayslip}
+              >
+                Download PDF Payslip
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full text-xs"
+                icon={Printer}
+                onClick={() => setIsPayslipModalOpen(true)}
+              >
+                View Full Earnings Statement
+              </Button>
+
+              <div className="text-center pt-1">
+                <Link
+                  href="/payroll"
+                  className="text-xs text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1"
+                >
+                  Browse Past Payslips <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 4. Secondary Operations & Noticeboard Tier (Leave Requests, Shift Logs + Company Noticeboard) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+        {/* Left Column (lg:col-span-2): Leave Requests & Verified Shifts */}
+        <div className="lg:col-span-2 space-y-6 flex flex-col justify-between">
+          {/* Section B: Quick Leave Application Shortcut & Recent Requests */}
+          <Card className="flex-1 flex flex-col justify-between">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-indigo-400" />
-                  My Monthly Attendance Calendar
+                  <CalendarDays className="w-4 h-4 text-indigo-400 shrink-0" />
+                  <span>My Leave Requests</span>
                 </CardTitle>
-                <p className="text-xs text-zinc-400 mt-0.5">
-                  Color-coded presence record for October 2026. Click any day to inspect check-in timestamps.
-                </p>
-              </div>
-              <Badge variant="secondary" size="sm" className="font-mono">
-                October 2026
-              </Badge>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Day-of-week headers */}
-              <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] font-semibold text-zinc-400 pb-1 border-b border-zinc-800">
-                <span>Sun</span>
-                <span>Mon</span>
-                <span>Tue</span>
-                <span>Wed</span>
-                <span>Thu</span>
-                <span>Fri</span>
-                <span>Sat</span>
-              </div>
-
-              {/* Calendar Days Grid */}
-              <div className="grid grid-cols-7 gap-1.5">
-                {calendarDays.map((item) => {
-                  const isSelected = selectedCalendarDay?.day === item.day;
-
-                  let cellColor = "border-zinc-800 bg-zinc-900/40 text-zinc-400";
-                  let dotColor = "bg-zinc-600";
-
-                  if (item.status === "Present") {
-                    cellColor = "border-emerald-500/30 bg-emerald-950/20 text-emerald-300 hover:bg-emerald-900/30";
-                    dotColor = "bg-emerald-400";
-                  } else if (item.status === "Late") {
-                    cellColor = "border-amber-500/30 bg-amber-950/20 text-amber-300 hover:bg-amber-900/30";
-                    dotColor = "bg-amber-400";
-                  } else if (item.status === "Half-Day") {
-                    cellColor = "border-purple-500/30 bg-purple-950/20 text-purple-300 hover:bg-purple-900/30";
-                    dotColor = "bg-purple-400";
-                  } else if (item.status === "Leave") {
-                    cellColor = "border-blue-500/30 bg-blue-950/20 text-blue-300 hover:bg-blue-900/30";
-                    dotColor = "bg-blue-400";
-                  } else if (item.status === "Absent") {
-                    cellColor = "border-rose-500/30 bg-rose-950/20 text-rose-300 hover:bg-rose-900/30";
-                    dotColor = "bg-rose-400";
-                  } else if (item.status === "Weekend") {
-                    cellColor = "border-zinc-900 bg-zinc-950/50 text-zinc-600";
-                    dotColor = "bg-zinc-700";
-                  }
-
-                  return (
-                    <button
-                      key={item.day}
-                      onClick={() => setSelectedCalendarDay(item)}
-                      className={`relative flex flex-col items-center justify-center p-2 rounded-xl border text-xs font-mono transition-all duration-150 ${cellColor} ${
-                        isSelected ? "ring-2 ring-indigo-500 shadow-glow" : ""
-                      }`}
-                    >
-                      <span className="font-semibold">{item.day}</span>
-                      {!item.isWeekend && item.status !== "Upcoming" && (
-                        <span className={`w-1.5 h-1.5 rounded-full mt-1 ${dotColor}`} />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Selected Day Inspection Drawer */}
-              {selectedCalendarDay && (
-                <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-zinc-100 font-mono">
-                        {selectedCalendarDay.date} ({selectedCalendarDay.dayOfWeek})
-                      </span>
-                      <Badge
-                        variant={
-                          selectedCalendarDay.status === "Present"
-                            ? "success"
-                            : selectedCalendarDay.status === "Late"
-                            ? "warning"
-                            : selectedCalendarDay.status === "Half-Day"
-                            ? "purple"
-                            : selectedCalendarDay.status === "Leave"
-                            ? "info"
-                            : "secondary"
-                        }
-                        size="sm"
-                      >
-                        {selectedCalendarDay.status}
-                      </Badge>
-                    </div>
-                    <p className="text-zinc-400">{selectedCalendarDay.details}</p>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-[11px] font-mono shrink-0">
-                    <div>
-                      <span className="text-zinc-500 block">Check-In</span>
-                      <span className="text-zinc-200 font-semibold">
-                        {selectedCalendarDay.clockIn || "--:--"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-zinc-500 block">Check-Out</span>
-                      <span className="text-zinc-200 font-semibold">
-                        {selectedCalendarDay.clockOut || "--:--"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-zinc-500 block">Duration</span>
-                      <span className="text-indigo-400 font-semibold">
-                        {selectedCalendarDay.totalHours || "--"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Color Legend */}
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-800 text-[11px] text-zinc-400">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <span>Present</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                  <span>Late (&gt;09:15)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
-                  <span>Half-Day (&lt;5h)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                  <span>Leave</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                  <span>Absent</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
-                  <span>Weekend</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Section B: Quick Leave Application Shortcut & Recent Requests */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
-              <div>
-                <CardTitle>My Leave Requests</CardTitle>
                 <p className="text-xs text-zinc-400 mt-0.5">
                   Quick leave application shortcut and status of your active submissions.
                 </p>
@@ -593,11 +676,12 @@ export default function EmployeeDashboardPage() {
                 size="sm"
                 icon={Plus}
                 onClick={() => setIsLeaveModalOpen(true)}
+                className="shrink-0"
               >
                 Apply Leave
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 flex flex-col justify-center">
               {leaveRequests.length === 0 ? (
                 <EmptyState
                   compact
@@ -609,59 +693,61 @@ export default function EmployeeDashboardPage() {
                   onAction={() => setIsLeaveModalOpen(true)}
                 />
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Duration & Dates</TableHead>
-                      <TableHead>Reason</TableHead>
-                      <TableHead className="text-right">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {leaveRequests.map((req) => (
-                      <TableRow key={req.id}>
-                        <TableCell className="font-medium text-xs text-zinc-100">
-                          {req.leaveType}
-                        </TableCell>
-                        <TableCell className="text-xs text-zinc-300">
-                          {req.startDate} to {req.endDate}{" "}
-                          <span className="text-[10px] text-zinc-500 font-mono">
-                            ({req.daysCount} working days)
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-xs text-zinc-400 max-w-xs truncate">
-                          {req.reason}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge
-                            variant={
-                              req.status === "Approved"
-                                ? "success"
-                                : req.status === "Rejected"
-                                ? "danger"
-                                : "warning"
-                            }
-                            size="sm"
-                          >
-                            {req.status}
-                          </Badge>
-                        </TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Duration & Dates</TableHead>
+                        <TableHead>Reason</TableHead>
+                        <TableHead className="text-right">Status</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {leaveRequests.map((req) => (
+                        <TableRow key={req.id}>
+                          <TableCell className="font-medium text-xs text-zinc-100">
+                            {req.leaveType}
+                          </TableCell>
+                          <TableCell className="text-xs text-zinc-300">
+                            {req.startDate} to {req.endDate}{" "}
+                            <span className="text-[10px] text-zinc-500 font-mono">
+                              ({req.daysCount} working days)
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-xs text-zinc-400 max-w-xs truncate">
+                            {req.reason}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Badge
+                              variant={
+                                req.status === "Approved"
+                                  ? "success"
+                                  : req.status === "Rejected"
+                                  ? "danger"
+                                  : "warning"
+                              }
+                              size="sm"
+                            >
+                              {req.status}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Section B.2: Recent Shift Logs (Eliminates emptiness & provides full punch visibility) */}
-          <Card>
+          {/* Section C: Recent Verified Shift Logs */}
+          <Card className="flex-1 flex flex-col justify-between">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-emerald-400" />
-                  Recent Verified Shift Logs
+                  <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Recent Verified Shift Logs</span>
                 </CardTitle>
                 <p className="text-xs text-zinc-400 mt-0.5">
                   Detailed timestamps, work durations, and status badges from your latest office shifts.
@@ -669,12 +755,12 @@ export default function EmployeeDashboardPage() {
               </div>
               <Link
                 href="/attendance"
-                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1"
+                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1 shrink-0"
               >
                 Full Board <ArrowRight className="w-3 h-3" />
               </Link>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
@@ -727,102 +813,24 @@ export default function EmployeeDashboardPage() {
           </Card>
         </div>
 
-        {/* Right Column (lg:col-span-1): Latest Payslip & Noticeboard */}
-        <div className="space-y-6">
-          {/* Section C: Latest Payslip Card with Instant Download PDF */}
-          <Card className="border-indigo-500/20 bg-gradient-to-b from-zinc-900 via-zinc-900 to-indigo-950/20">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-indigo-400" />
-                  Latest Payslip
-                </CardTitle>
-                <Badge variant="success" size="sm">
-                  Disbursed
-                </Badge>
-              </div>
-              <p className="text-xs text-zinc-400 mt-0.5">
-                {latestPayslip?.period || "Oct 01, 2026 - Oct 15, 2026"}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800 space-y-3">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-xs text-zinc-400">Net Take-Home Pay</span>
-                  <span className="text-2xl font-bold font-mono text-emerald-400">
-                    {formatCurrency(latestPayslip?.netPay || 4390)}
-                  </span>
-                </div>
-
-                <div className="space-y-1.5 text-xs pt-2 border-t border-zinc-800/80">
-                  <div className="flex justify-between text-zinc-400">
-                    <span>Gross Earnings (Basic × 1.5)</span>
-                    <span className="font-mono text-zinc-200">
-                      {formatCurrency(latestPayslip?.totalGross || 6041.67)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-zinc-400">
-                    <span>Tax Slabs & Withholding</span>
-                    <span className="font-mono text-rose-400">
-                      -{formatCurrency(latestPayslip?.totalTaxes || 1313.22)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-zinc-400">
-                    <span>Attendance Deductions</span>
-                    <span className="font-mono text-rose-400">
-                      -{formatCurrency(latestPayslip?.attendanceDeduction || 0)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Instant Action Buttons */}
-              <div className="space-y-2">
-                <Button
-                  className="w-full text-xs font-semibold"
-                  icon={Download}
-                  onClick={handleDownloadPayslip}
-                >
-                  Download PDF Payslip
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full text-xs"
-                  icon={Printer}
-                  onClick={() => setIsPayslipModalOpen(true)}
-                >
-                  View Full Earnings Statement
-                </Button>
-              </div>
-
-              <div className="text-center pt-1">
-                <Link
-                  href="/payroll"
-                  className="text-xs text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1"
-                >
-                  Browse Past Payslips <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Section D: Company Announcements Noticeboard */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Megaphone className="w-4 h-4 text-amber-400" />
-                  Company Noticeboard
-                </CardTitle>
-                <Badge variant="warning" size="sm">
-                  {announcements.length} New
-                </Badge>
-              </div>
-              <p className="text-xs text-zinc-400 mt-0.5">
-                Official company updates, holiday closures, and benefits alerts.
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-3.5">
+        {/* Right Column (lg:col-span-1): Company Announcements Noticeboard */}
+        <Card className="lg:col-span-1 flex flex-col justify-between h-full">
+          <CardHeader className="pb-3 flex flex-col items-start gap-1">
+            <div className="flex items-center justify-between w-full">
+              <CardTitle className="flex items-center gap-2">
+                <Megaphone className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Company Noticeboard</span>
+              </CardTitle>
+              <Badge variant="warning" size="sm" className="shrink-0">
+                {announcements.length} New
+              </Badge>
+            </div>
+            <p className="text-xs text-zinc-400">
+              Official company updates, holiday closures, and benefits alerts.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-3.5 flex-1 flex flex-col justify-between">
+            <div className="space-y-3">
               {announcements.map((ann) => (
                 <div
                   key={ann.id}
@@ -852,9 +860,18 @@ export default function EmployeeDashboardPage() {
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+
+            <div className="pt-3 text-center border-t border-zinc-800/80 mt-auto">
+              <Link
+                href="/documents"
+                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1"
+              >
+                View All Announcements & Docs <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Modals */}

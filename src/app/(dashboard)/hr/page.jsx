@@ -179,74 +179,84 @@ export default function HrDashboardPage() {
       {/* 2. Daily Snapshot Cards (5 cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         {/* Card 1: Total Employees */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-400">Total Workforce</span>
-            <Users className="w-4 h-4 text-zinc-400" />
+        <Card className="p-4 flex flex-col justify-between h-full min-h-[120px] transition-all hover:border-zinc-700/80">
+          <div className="flex items-start justify-between gap-2 min-h-[28px]">
+            <span className="text-xs font-medium text-zinc-400">Total Workforce</span>
+            <Users className="w-4 h-4 text-zinc-400 shrink-0" />
           </div>
-          <div className="text-2xl font-bold font-mono text-zinc-100 mt-2">
-            {totalEmployees}
+          <div className="mt-auto pt-2">
+            <div className="text-2xl font-bold font-mono tracking-tight text-zinc-100">
+              {totalEmployees}
+            </div>
+            <div className="text-[11px] text-zinc-500 mt-1 truncate">Across 5 departments</div>
           </div>
-          <div className="text-[11px] text-zinc-500 mt-1">Across 5 departments</div>
         </Card>
 
         {/* Card 2: Present Today */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-400">Present Today</span>
-            <Badge variant="success" dot size="sm">
+        <Card className="p-4 flex flex-col justify-between h-full min-h-[120px] transition-all hover:border-zinc-700/80">
+          <div className="flex items-start justify-between gap-2 min-h-[28px]">
+            <span className="text-xs font-medium text-zinc-400">Present Today</span>
+            <Badge variant="success" dot size="sm" className="shrink-0">
               On-Duty
             </Badge>
           </div>
-          <div className="text-2xl font-bold font-mono text-emerald-400 mt-2">
-            {presentToday}
-          </div>
-          <div className="text-[11px] text-emerald-500/80 mt-1 flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" />
-            {Math.round((presentToday / totalEmployees) * 100)}% attendance rate
+          <div className="mt-auto pt-2">
+            <div className="text-2xl font-bold font-mono tracking-tight text-emerald-400">
+              {presentToday}
+            </div>
+            <div className="text-[11px] text-emerald-500/80 mt-1 flex items-center gap-1 truncate">
+              <CheckCircle2 className="w-3 h-3 shrink-0" />
+              <span>{Math.round((presentToday / totalEmployees) * 100)}% attendance rate</span>
+            </div>
           </div>
         </Card>
 
         {/* Card 3: Late Today */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-400">Late Today</span>
-            <Badge variant="warning" dot size="sm">
+        <Card className="p-4 flex flex-col justify-between h-full min-h-[120px] transition-all hover:border-zinc-700/80">
+          <div className="flex items-start justify-between gap-2 min-h-[28px]">
+            <span className="text-xs font-medium text-zinc-400">Late Today</span>
+            <Badge variant="warning" dot size="sm" className="shrink-0">
               &gt; 09:15
             </Badge>
           </div>
-          <div className="text-2xl font-bold font-mono text-amber-400 mt-2">
-            {lateToday}
+          <div className="mt-auto pt-2">
+            <div className="text-2xl font-bold font-mono tracking-tight text-amber-400">
+              {lateToday}
+            </div>
+            <div className="text-[11px] text-amber-500/80 mt-1 truncate">Grace 15m elapsed</div>
           </div>
-          <div className="text-[11px] text-amber-500/80 mt-1">Grace 15m elapsed</div>
         </Card>
 
         {/* Card 4: On Leave Today */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-400">On Leave Today</span>
-            <Badge variant="info" dot size="sm">
+        <Card className="p-4 flex flex-col justify-between h-full min-h-[120px] transition-all hover:border-zinc-700/80">
+          <div className="flex items-start justify-between gap-2 min-h-[28px]">
+            <span className="text-xs font-medium text-zinc-400">On Leave Today</span>
+            <Badge variant="info" dot size="sm" className="shrink-0">
               Approved
             </Badge>
           </div>
-          <div className="text-2xl font-bold font-mono text-indigo-400 mt-2">
-            {onLeaveToday}
+          <div className="mt-auto pt-2">
+            <div className="text-2xl font-bold font-mono tracking-tight text-indigo-400">
+              {onLeaveToday}
+            </div>
+            <div className="text-[11px] text-indigo-400/80 mt-1 truncate">Vacation & sick leave</div>
           </div>
-          <div className="text-[11px] text-indigo-400/80 mt-1">Vacation & sick leave</div>
         </Card>
 
         {/* Card 5: Pending Approvals */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-400">Pending Approvals</span>
-            <Badge variant="purple" dot size="sm">
+        <Card className="p-4 flex flex-col justify-between h-full min-h-[120px] transition-all hover:border-zinc-700/80">
+          <div className="flex items-start justify-between gap-2 min-h-[28px]">
+            <span className="text-xs font-medium text-zinc-400 leading-tight">Pending Approvals</span>
+            <Badge variant="purple" dot size="sm" className="shrink-0">
               Action Req
             </Badge>
           </div>
-          <div className="text-2xl font-bold font-mono text-purple-400 mt-2">
-            {pendingItems.length}
+          <div className="mt-auto pt-2">
+            <div className="text-2xl font-bold font-mono tracking-tight text-purple-400">
+              {pendingItems.length}
+            </div>
+            <div className="text-[11px] text-purple-400/80 mt-1 truncate">Leaves + Corrections</div>
           </div>
-          <div className="text-[11px] text-purple-400/80 mt-1">Leaves + Corrections</div>
         </Card>
       </div>
 
@@ -340,15 +350,17 @@ export default function HrDashboardPage() {
         </Card>
 
         {/* Section B: Watchlist Widget (Top 5 frequent late-comers) */}
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle>Lateness Watchlist</CardTitle>
-              <Badge variant="warning" size="sm">
+        <Card className="h-full flex flex-col">
+          <CardHeader className="pb-3 flex flex-col items-start gap-1">
+            <div className="flex items-center justify-between w-full">
+              <CardTitle className="text-base font-semibold text-zinc-100">
+                Lateness Watchlist
+              </CardTitle>
+              <Badge variant="warning" size="sm" className="shrink-0">
                 This Month
               </Badge>
             </div>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-zinc-400">
               Frequent check-ins after 09:15 office threshold.
             </p>
           </CardHeader>
