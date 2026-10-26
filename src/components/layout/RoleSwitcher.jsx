@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 export function RoleSwitcher() {
   const router = useRouter();
   const { role, switchDemoRole, user } = useAuth();
-  const { notifySuccess } = useNotification();
+  const { notifySuccess, notifyError } = useNotification();
   const [isOpen, setIsOpen] = useState(false);
 
   const roles = [
@@ -48,10 +48,18 @@ export function RoleSwitcher() {
 
   const handleRoleSelect = async (roleObj) => {
     setIsOpen(false);
-    await switchDemoRole(roleObj.id);
-    const loginMsg = `Logged in successfully as ${roleObj.label}`;
-    notifySuccess("Role Switched", loginMsg);
-    router.push(roleObj.path);
+    if (roleObj.id === activeRoleCanonical) {
+      router.push(roleObj.path);
+      return;
+    }
+    try {
+      await switchDemoRole(roleObj.id);
+      const loginMsg = `Authenticated as ${roleObj.label}`;
+      notifySuccess("Session Verified", loginMsg);
+      router.push(roleObj.path);
+    } catch (err) {
+      notifyError("Authentication Failed", `Could not verify credentials for ${roleObj.label}`);
+    }
   };
 
   return (

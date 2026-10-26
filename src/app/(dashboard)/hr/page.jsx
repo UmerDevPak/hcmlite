@@ -20,6 +20,7 @@ import {
   FileSpreadsheet,
   Trash2,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
 import { reportService } from "@/services/reportService";
@@ -35,7 +36,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmployeeModal } from "@/components/employees/EmployeeModal";
 
 export default function HrDashboardPage() {
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, isHR, loading: authLoading } = useAuth();
   const { notifySuccess, notifyInfo, notifyError } = useNotification();
 
   const [metrics, setMetrics] = useState(null);
@@ -43,7 +45,14 @@ export default function HrDashboardPage() {
   const [pendingItems, setPendingItems] = useState([]);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (!authLoading && user && !isHR) {
+      router.replace("/employee");
+    }
+  }, [user, isHR, authLoading, router]);
+
   const loadData = async () => {
+    if (!isHR) return;
     try {
       const data = await reportService.getHrDashboardMetrics();
       setMetrics(data);
@@ -127,6 +136,10 @@ export default function HrDashboardPage() {
       }
     }
   };
+
+  if (!authLoading && (!user || !isHR)) {
+    return null;
+  }
 
   if (loading) {
     return (

@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { normalizeRole } from "@/lib/constants";
 import {
   Settings,
   Shield,
@@ -21,13 +23,25 @@ import { Input } from "@/components/ui/Input";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/Table";
 
 export default function SettingsPage() {
-  const { user, isAdmin } = useAuth();
+  const router = useRouter();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const { notifySuccess } = useNotification();
+
+  useEffect(() => {
+    if (!authLoading && user && !isAdmin) {
+      const userRole = normalizeRole(user.role);
+      router.replace(userRole === "HR" ? "/hr" : "/employee");
+    }
+  }, [user, isAdmin, authLoading, router]);
 
   const [companyName, setCompanyName] = useState("HCM Lite Technologies, Inc.");
   const [ein, setEin] = useState("94-3829102");
   const [currency, setCurrency] = useState("USD ($)");
   const [address, setAddress] = useState("100 Market St, Suite 400, San Francisco, CA 94105");
+
+  if (!authLoading && (!user || !isAdmin)) {
+    return null;
+  }
 
   const handleSaveCompany = (e) => {
     e.preventDefault();

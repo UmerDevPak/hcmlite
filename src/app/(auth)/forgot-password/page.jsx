@@ -1,16 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Mail, Building2, CheckCircle2 } from "lucide-react";
 import { authService } from "@/services/authService";
+import { useAuth } from "@/context/AuthContext";
+import { normalizeRole } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      const norm = normalizeRole(user.role);
+      const dest = norm === "ADMIN" ? "/admin" : norm === "HR" ? "/hr" : "/employee";
+      router.replace(dest);
+    }
+  }, [user, authLoading, router]);
+
+  if (!authLoading && user) {
+    return null;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

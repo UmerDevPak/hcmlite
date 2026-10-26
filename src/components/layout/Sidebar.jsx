@@ -100,7 +100,7 @@ export function Sidebar({ isOpen, onClose }) {
         { name: "My Dashboard", href: "/employee", icon: LayoutDashboard },
         { name: "My Attendance", href: "/attendance", icon: Clock },
         { name: "Apply Leave", href: "/leave", icon: CalendarDays },
-        { name: "My Payslips", href: "/payroll", icon: CreditCard },
+        { name: "My Payslips", href: "/employee", icon: CreditCard },
         { name: "My Profile", href: "/profile", icon: User },
       ],
     },

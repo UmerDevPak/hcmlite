@@ -20,7 +20,9 @@ import {
   BarChart3,
   ExternalLink,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { normalizeRole } from "@/lib/constants";
 import { reportService } from "@/services/reportService";
 import { formatCurrency } from "@/lib/utils";
 import { StatCard } from "@/components/ui/StatCard";
@@ -32,12 +34,21 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmployeeModal } from "@/components/employees/EmployeeModal";
 
 export default function AdminDashboardPage() {
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (!authLoading && user && !isAdmin) {
+      const userRole = normalizeRole(user.role);
+      router.replace(userRole === "HR" ? "/hr" : "/employee");
+    }
+  }, [user, isAdmin, authLoading, router]);
+
   const loadData = async () => {
+    if (!isAdmin) return;
     try {
       const data = await reportService.getAdminDashboardMetrics();
       setMetrics(data);
@@ -49,8 +60,14 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isAdmin) {
+      loadData();
+    }
+  }, [isAdmin]);
+
+  if (!authLoading && (!user || !isAdmin)) {
+    return null;
+  }
 
   if (loading) {
     return (

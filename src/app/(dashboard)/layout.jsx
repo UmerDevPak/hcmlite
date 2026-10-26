@@ -1,15 +1,64 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { CommandPalette } from "@/components/layout/CommandPalette";
 import { useAuth } from "@/context/AuthContext";
+import { useNotification } from "@/context/NotificationContext";
+import { normalizeRole } from "@/lib/constants";
+
+export function getRouteAccess(pathname, rawRole) {
+  const role = normalizeRole(rawRole);
+  const path = pathname || "";
+
+  // 1. Admin-only routes
+  if (
+    path.startsWith("/admin") ||
+    path.startsWith("/settings") ||
+    path.startsWith("/setup")
+  ) {
+    if (role === "ADMIN") return { authorized: true };
+    return {
+      authorized: false,
+      redirectPath: role === "HR" ? "/hr" : "/employee",
+      reason: "Administrator verification required for this portal.",
+    };
+  }
+
+  // 2. HR & Admin routes
+  if (
+    path.startsWith("/hr") ||
+    path.startsWith("/recruitment")
+  ) {
+    if (role === "ADMIN" || role === "HR") return { authorized: true };
+    return {
+      authorized: false,
+      redirectPath: "/employee",
+      reason: "Human Resources verification required for this portal.",
+    };
+  }
+
+  // 3. Payroll route (Admin & HR only)
+  if (path.startsWith("/payroll")) {
+    if (role === "ADMIN" || role === "HR") return { authorized: true };
+    return {
+      authorized: false,
+      redirectPath: "/employee",
+      reason: "Payroll processing is restricted to HR and Administrators.",
+    };
+  }
+
+  // 4. Employee self-service and shared directory/document routes
+  return { authorized: true };
+}
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, loading } = useAuth();
+  const { notifyError } = useNotification();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
@@ -25,12 +74,23 @@ export default function DashboardLayout({ children }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Protect dashboard routes: redirect unauthenticated sessions to /login
+  // 1. Protect dashboard routes: redirect unauthenticated sessions to /login
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login");
+      router.replace("/login");
     }
   }, [user, loading, router]);
+
+  // 2. Role-based Route Protection
+  const userRole = normalizeRole(user?.role);
+  const routeAccess = getRouteAccess(pathname, userRole);
+
+  useEffect(() => {
+    if (!loading && user && !routeAccess.authorized) {
+      notifyError("Access Denied", routeAccess.reason);
+      router.replace(routeAccess.redirectPath);
+    }
+  }, [user, loading, routeAccess.authorized, routeAccess.redirectPath, routeAccess.reason, router, notifyError]);
 
   if (loading) {
     return (
@@ -45,6 +105,19 @@ export default function DashboardLayout({ children }) {
 
   if (!user) {
     return null;
+  }
+
+  if (!routeAccess.authorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-400">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-mono text-rose-400 font-semibold">
+            {routeAccess.reason} Redirecting...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -22,11 +22,13 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/Table";
 import { StatCard } from "@/components/ui/StatCard";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useRouter } from "next/navigation";
 import { RunPayrollModal } from "@/components/payroll/RunPayrollModal";
 import { PayslipModal } from "@/components/payroll/PayslipModal";
 
 export default function PayrollPage() {
-  const { user, isAdmin, isHR } = useAuth();
+  const router = useRouter();
+  const { user, isAdmin, isHR, loading: authLoading } = useAuth();
   const { notifySuccess } = useNotification();
 
   const [runs, setRuns] = useState([]);
@@ -36,7 +38,14 @@ export default function PayrollPage() {
   const [selectedRunInfo, setSelectedRunInfo] = useState(null);
   const [isPayslipModalOpen, setIsPayslipModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (!authLoading && user && !isAdmin && !isHR) {
+      router.replace("/employee");
+    }
+  }, [user, isAdmin, isHR, authLoading, router]);
+
   const fetchPayroll = async () => {
+    if (!isAdmin && !isHR) return;
     try {
       const data = await payrollService.getAllPayrollRuns();
       setRuns(data);
@@ -46,8 +55,14 @@ export default function PayrollPage() {
   };
 
   useEffect(() => {
-    fetchPayroll();
-  }, []);
+    if (isAdmin || isHR) {
+      fetchPayroll();
+    }
+  }, [isAdmin, isHR]);
+
+  if (!authLoading && (!user || (!isAdmin && !isHR))) {
+    return null;
+  }
 
   const handleInspectPayslip = async (run) => {
     // If run has payslips, show current user's or the first employee's payslip

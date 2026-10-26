@@ -17,7 +17,7 @@ import { isLiveFirebaseConfigured } from "@/lib/firebase/client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, switchDemoRole } = useAuth();
+  const { user, loading: authLoading, signIn, switchDemoRole } = useAuth();
   const { notifySuccess, notifyError } = useNotification();
 
   const [email, setEmail] = useState("");
@@ -26,6 +26,14 @@ export default function LoginPage() {
   const [loginError, setLoginError] = useState("");
   const [pendingUser, setPendingUser] = useState(null);
   const [showForcePasswordModal, setShowForcePasswordModal] = useState(false);
+
+  // If already authenticated, cannot return to /login
+  useEffect(() => {
+    if (!authLoading && user) {
+      const dest = getRoleDashboard(user.role);
+      router.replace(dest);
+    }
+  }, [user, authLoading, router]);
 
   // First-Run Detection: If company_settings is empty, redirect to /setup
   useEffect(() => {
@@ -182,6 +190,17 @@ export default function LoginPage() {
     router.push(dest);
   };
 
+  if (!authLoading && user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-400">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-mono text-zinc-500">Already authenticated. Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex bg-zinc-950 text-zinc-100">
       {/* Left visual side */}
@@ -245,7 +264,18 @@ export default function LoginPage() {
                     : canonical === "HR"
                     ? UserCheck
                     : User;
-                return (
+                if (!authLoading && user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-400">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-mono text-zinc-500">Already authenticated. Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
                   <button
                     key={u.uid}
                     type="button"

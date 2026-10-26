@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -23,7 +23,7 @@ import { isLiveFirebaseConfigured } from "@/lib/firebase/client";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { signUp } = useAuth();
+  const { user, loading: authLoading, signUp } = useAuth();
   const { notifySuccess, notifyError } = useNotification();
 
   const [formData, setFormData] = useState({
@@ -38,6 +38,15 @@ export default function SignUpPage() {
 
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState("");
+
+  // If already authenticated, cannot return to /signup
+  useEffect(() => {
+    if (!authLoading && user) {
+      const norm = normalizeRole(user.role);
+      const dest = norm === "ADMIN" ? "/admin" : norm === "HR" ? "/hr" : "/employee";
+      router.replace(dest);
+    }
+  }, [user, authLoading, router]);
 
   const roleOptions = [
     { value: ROLES.ADMIN, label: "Admin (Full System Access)" },
@@ -130,6 +139,17 @@ export default function SignUpPage() {
       setLoading(false);
     }
   };
+
+  if (!authLoading && user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-400">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-mono text-zinc-500">Already authenticated. Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex bg-zinc-950 text-zinc-100">

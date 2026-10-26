@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import {
   Briefcase,
@@ -28,7 +29,8 @@ import { Avatar } from "@/components/ui/Avatar";
 import { JobModal } from "@/components/recruitment/JobModal";
 
 export default function RecruitmentPage() {
-  const { isHR } = useAuth();
+  const router = useRouter();
+  const { user, isHR, isAdmin, loading: authLoading } = useAuth();
   const { notifySuccess, notifyError } = useNotification();
 
   const [activeTab, setActiveTab] = useState("pipeline"); // "pipeline" | "jobs"
@@ -37,6 +39,12 @@ export default function RecruitmentPage() {
   const [loading, setLoading] = useState(true);
   const [isJobModalOpen, setIsJobModalOpen] = useState(false);
   const pipelineScrollRef = useRef(null);
+
+  useEffect(() => {
+    if (!authLoading && user && !isHR && !isAdmin) {
+      router.replace("/employee");
+    }
+  }, [user, isHR, isAdmin, authLoading, router]);
 
   const scrollPipeline = (direction) => {
     if (pipelineScrollRef.current) {
@@ -52,6 +60,7 @@ export default function RecruitmentPage() {
   }, [activeTab]);
 
   const loadData = async () => {
+    if (!isHR && !isAdmin) return;
     try {
       const [allJobs, allCandidates] = await Promise.all([
         recruitmentService.getAllJobs(),
@@ -107,6 +116,10 @@ export default function RecruitmentPage() {
     "Offer Extended",
     "Hired",
   ];
+
+  if (!authLoading && (!user || (!isHR && !isAdmin))) {
+    return null;
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
