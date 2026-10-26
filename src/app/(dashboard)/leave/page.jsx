@@ -11,6 +11,7 @@ import {
   Check,
   X,
   FileCheck,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
@@ -64,6 +65,21 @@ export default function LeavePage() {
       notifyError("Failed to update leave", err.message);
     } finally {
       setLoadingAction(null);
+    }
+  };
+
+  const handleDeleteLeave = async (id, empName) => {
+    if (confirm(`Are you sure you want to delete this leave record for ${empName}? This will restore deducted days back to the employee.`)) {
+      setLoadingAction(id);
+      try {
+        await leaveService.deleteRequest(id);
+        notifySuccess("Leave Record Deleted", `Leave request for ${empName} was removed.`);
+        loadData();
+      } catch (err) {
+        notifyError("Failed to delete leave", err.message);
+      } finally {
+        setLoadingAction(null);
+      }
     }
   };
 
@@ -216,32 +232,44 @@ export default function LeavePage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {req.status === LEAVE_STATUS.PENDING && (isHR || isManager) ? (
-                          <div className="flex items-center justify-end gap-1.5">
-                            <Button
-                              variant="success"
-                              size="sm"
-                              icon={Check}
-                              isLoading={loadingAction === req.id}
-                              onClick={() => handleReview(req.id, LEAVE_STATUS.APPROVED)}
-                            >
-                              Approve
-                            </Button>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              icon={X}
-                              isLoading={loadingAction === req.id}
-                              onClick={() => handleReview(req.id, LEAVE_STATUS.REJECTED)}
-                            >
-                              Reject
-                            </Button>
-                          </div>
-                        ) : (
-                          <span className="text-[11px] text-zinc-500">
-                            {req.reviewedBy ? `Signed by ${req.reviewedBy}` : "Completed"}
-                          </span>
-                        )}
+                        <div className="flex items-center justify-end gap-2">
+                          {req.status === LEAVE_STATUS.PENDING ? (
+                            <>
+                              <Button
+                                variant="success"
+                                size="sm"
+                                icon={Check}
+                                isLoading={loadingAction === req.id}
+                                onClick={() => handleReview(req.id, LEAVE_STATUS.APPROVED)}
+                              >
+                                Approve
+                              </Button>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                icon={X}
+                                isLoading={loadingAction === req.id}
+                                onClick={() => handleReview(req.id, LEAVE_STATUS.REJECTED)}
+                              >
+                                Reject
+                              </Button>
+                            </>
+                          ) : (
+                            <span className="text-[11px] text-zinc-400 font-medium">
+                              {req.reviewedBy ? `Signed by ${req.reviewedBy}` : "Completed"}
+                            </span>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteLeave(req.id, req.employeeName)}
+                            title="Delete leave record"
+                            disabled={loadingAction === req.id}
+                            className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors disabled:opacity-50"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

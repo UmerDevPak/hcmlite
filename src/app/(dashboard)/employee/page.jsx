@@ -22,6 +22,7 @@ import {
   Check,
   Megaphone,
   BellRing,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
@@ -91,6 +92,18 @@ export default function EmployeeDashboardPage() {
   useEffect(() => {
     loadData();
   }, [user]);
+
+  const handleCancelLeave = async (id) => {
+    if (confirm("Are you sure you want to cancel and delete this leave application?")) {
+      try {
+        await leaveService.deleteRequest(id);
+        notifySuccess("Leave Cancelled", "Your leave application has been withdrawn.");
+        loadData();
+      } catch (err) {
+        notifyError("Failed to cancel leave", err.message);
+      }
+    }
+  };
 
   // Attendance Web Check-In / Check-Out Toggle
   const handlePunchToggle = async () => {
@@ -699,7 +712,8 @@ export default function EmployeeDashboardPage() {
                         <TableHead>Type</TableHead>
                         <TableHead>Duration & Dates</TableHead>
                         <TableHead>Reason</TableHead>
-                        <TableHead className="text-right">Status</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Action</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -717,7 +731,7 @@ export default function EmployeeDashboardPage() {
                           <TableCell className="text-xs text-zinc-400 max-w-xs truncate">
                             {req.reason}
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell>
                             <Badge
                               variant={
                                 req.status === "Approved"
@@ -730,6 +744,16 @@ export default function EmployeeDashboardPage() {
                             >
                               {req.status}
                             </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleCancelLeave(req.id)}
+                              title="Cancel / Delete leave application"
+                              className="p-1 rounded text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </TableCell>
                         </TableRow>
                       ))}

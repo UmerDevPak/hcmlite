@@ -99,4 +99,25 @@ export const recruitmentService = {
 
     return newCandidate;
   },
+
+  async deleteCandidate(candidateId) {
+    const list = getCandidates();
+    const candidate = list.find((c) => c.id === candidateId);
+    if (!candidate) return false;
+
+    const updated = list.filter((c) => c.id !== candidateId);
+    saveCandidates(updated);
+
+    // Update job applicant count
+    if (candidate.jobId) {
+      const jobs = getJobs();
+      const jobIndex = jobs.findIndex((j) => j.id === candidate.jobId);
+      if (jobIndex !== -1 && jobs[jobIndex].applicantsCount > 0) {
+        jobs[jobIndex].applicantsCount -= 1;
+        saveJobs(jobs);
+      }
+    }
+
+    return true;
+  },
 };

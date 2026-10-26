@@ -32,7 +32,8 @@ import { Skeleton, TableSkeleton } from "@/components/ui/Skeleton";
 import { EmployeeModal } from "@/components/employees/EmployeeModal";
 
 export default function EmployeesPage() {
-  const { user, isHR } = useAuth();
+  const { user, isHR, isAdmin } = useAuth();
+  const canManage = isHR || isAdmin;
   const { notifySuccess, notifyError } = useNotification();
 
   const [employees, setEmployees] = useState([]);
@@ -114,7 +115,7 @@ export default function EmployeesPage() {
           >
             Export CSV
           </Button>
-          {isHR && (
+          {canManage && (
             <Button
               size="sm"
               icon={Plus}
@@ -192,7 +193,7 @@ export default function EmployeesPage() {
         <EmptyState
           title="No employees found"
           description="Try adjusting your search criteria or add a new team member."
-          actionLabel={isHR ? "Add Employee" : null}
+          actionLabel={canManage ? "Add Employee" : null}
           onAction={() => {
             setEditingEmployee(null);
             setIsModalOpen(true);
@@ -266,7 +267,7 @@ export default function EmployeesPage() {
                           <ExternalLink className="w-3.5 h-3.5" />
                         </button>
                       </Link>
-                      {isHR && (
+                      {canManage && (
                         <>
                           <button
                             onClick={() => {

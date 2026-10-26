@@ -313,4 +313,55 @@ export const leaveService = {
     const rejected = requests.filter((r) => r.status === LEAVE_STATUS.REJECTED).length;
     return { pending, approved, rejected, total: requests.length };
   },
+
+  async deleteRequest(requestId) {
+    const requests = getRequests();
+    const target = requests.find((r) => r.id === requestId);
+    if (!target) return false;
+
+    // If the deleted request was approved, restore the quota back to the employee
+    if (target.status === LEAVE_STATUS.APPROVED && target.leaveType !== "Unpaid") {
+      const balances = getBalances();
+      const empBalance = balances[target.employeeId] || {
+        annual: LEAVE_QUOTAS.ANNUAL,
+        sick: LEAVE_QUOTAS.SICK,
+        casual: LEAVE_QUOTAS.CASUAL,
+      };
+
+      const typeKey = target.leaveType.toLowerCase().includes("sick")
+        ? "sick"
+        : target.leaveType.toLowerCase().includes("casual")
+        ? "casual"
+        : "annual";
+
+      empBalance[typeKey] = (empBalance[typeKey] || 0) + (target.daysCount || 0);
+      empBalance.vacation = empBalance.annual;
+      balances[target.employeeId] = empBalance;
+      saveBalances(balances);
+
+      if (isLiveFirebaseConfigured && db && target.employeeId) {
+        try {
+          const { doc, setDoc } = await import("firebase/firestore");
+          await setDoc(doc(db, "leave_balances", target.employeeId), empBalance, { merge: true });
+        } catch (err) {
+          console.warn("[leaveService] Firestore restore balance notice:", err.message);
+        }
+      }
+    }
+
+    const filtered = requests.filter((r) => r.id !== requestId);
+    saveRequests(filtered);
+    memoryLeaveRequestsCache = null;
+
+    if (isLiveFirebaseConfigured && db) {
+      try {
+        const { doc, deleteDoc } = await import("firebase/firestore");
+        await deleteDoc(doc(db, "leave_requests", requestId));
+      } catch (err) {
+        console.warn("[leaveService] Firestore delete request notice:", err.message);
+      }
+    }
+
+    return true;
+  },
 };

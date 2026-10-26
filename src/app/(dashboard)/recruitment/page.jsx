@@ -14,6 +14,7 @@ import {
   Sparkles,
   LayoutGrid,
   List,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
@@ -76,6 +77,18 @@ export default function RecruitmentPage() {
       loadData();
     } catch (err) {
       notifyError("Stage update failed", err.message);
+    }
+  };
+
+  const handleDeleteCandidate = async (candidateId, candidateName) => {
+    if (confirm(`Are you sure you want to remove candidate ${candidateName} from the pipeline?`)) {
+      try {
+        await recruitmentService.deleteCandidate(candidateId);
+        notifySuccess("Candidate Removed", `${candidateName} was removed from the ATS pipeline.`);
+        loadData();
+      } catch (err) {
+        notifyError("Failed to delete candidate", err.message);
+      }
     }
   };
 
@@ -274,19 +287,30 @@ export default function RecruitmentPage() {
                               {formatDate(c.appliedDate)}
                             </span>
 
-                            <select
-                              value={c.stage}
-                              onChange={(e) =>
-                                handleStageChange(c.id, e.target.value, c.name)
-                              }
-                              className="text-[11px] bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-lg border border-zinc-300 dark:border-zinc-700 px-2 py-1 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
-                            >
-                              {kanbanColumns.map((st) => (
-                                <option key={st} value={st}>
-                                  Move: {st}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="flex items-center gap-1.5">
+                              <select
+                                value={c.stage}
+                                onChange={(e) =>
+                                  handleStageChange(c.id, e.target.value, c.name)
+                                }
+                                className="text-[11px] bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-lg border border-zinc-300 dark:border-zinc-700 px-2 py-1 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                              >
+                                {kanbanColumns.map((st) => (
+                                  <option key={st} value={st}>
+                                    Move: {st}
+                                  </option>
+                                ))}
+                              </select>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteCandidate(c.id, c.name)}
+                                title="Remove candidate"
+                                className="p-1 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </div>
                         </Card>
                       ))}
@@ -366,6 +390,14 @@ export default function RecruitmentPage() {
                             </option>
                           ))}
                         </select>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCandidate(c.id, c.name)}
+                          title="Remove candidate"
+                          className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   );

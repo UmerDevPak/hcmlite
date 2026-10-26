@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Building2,
   FileSpreadsheet,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
@@ -110,6 +111,20 @@ export default function HrDashboardPage() {
       notifyInfo("Request Rejected", `${item.employeeName}'s ${item.category} has been declined.`);
     } catch (err) {
       notifyError("Action failed", err.message);
+    }
+  };
+
+  const handleDeleteInboxItem = async (item) => {
+    if (confirm(`Are you sure you want to delete and dismiss this request from ${item.employeeName}?`)) {
+      try {
+        if (item.sourceType === "LEAVE") {
+          await leaveService.deleteRequest(item.id);
+        }
+        setPendingItems((prev) => prev.filter((p) => p.id !== item.id));
+        notifySuccess("Request Deleted", `${item.employeeName}'s ${item.category} request was deleted.`);
+      } catch (err) {
+        notifyError("Action failed", err.message);
+      }
     }
   };
 
@@ -353,6 +368,14 @@ export default function HrDashboardPage() {
                       >
                         Reject
                       </Button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteInboxItem(item)}
+                        title="Delete / Dismiss request"
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
                 ))}
