@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useNotification } from "@/context/NotificationContext";
 import { normalizeRole } from "@/lib/constants";
 import { ShieldCheck, UserCheck, User, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,7 @@ import { cn } from "@/lib/utils";
 export function RoleSwitcher() {
   const router = useRouter();
   const { role, switchDemoRole, user } = useAuth();
+  const { notifySuccess } = useNotification();
   const [isOpen, setIsOpen] = useState(false);
 
   const roles = [
@@ -47,6 +49,8 @@ export function RoleSwitcher() {
   const handleRoleSelect = async (roleObj) => {
     setIsOpen(false);
     await switchDemoRole(roleObj.id);
+    const loginMsg = `Logged in successfully as ${roleObj.label}`;
+    notifySuccess("Role Switched", loginMsg);
     router.push(roleObj.path);
   };
 

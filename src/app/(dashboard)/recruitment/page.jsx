@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import {
   Briefcase,
@@ -8,6 +8,7 @@ import {
   Users,
   Star,
   MapPin,
+  ChevronLeft,
   ChevronRight,
   CheckCircle2,
   Calendar,
@@ -35,6 +36,20 @@ export default function RecruitmentPage() {
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isJobModalOpen, setIsJobModalOpen] = useState(false);
+  const pipelineScrollRef = useRef(null);
+
+  const scrollPipeline = (direction) => {
+    if (pipelineScrollRef.current) {
+      const offset = direction === "left" ? -340 : 340;
+      pipelineScrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "pipeline" && pipelineScrollRef.current) {
+      pipelineScrollRef.current.scrollLeft = 0;
+    }
+  }, [activeTab]);
 
   const loadData = async () => {
     try {
@@ -113,11 +128,42 @@ export default function RecruitmentPage() {
         )}
       </div>
 
-      <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+
+        {activeTab === "pipeline" && (
+          <div className="flex items-center gap-1.5 self-end sm:self-auto">
+            <span className="text-[11px] text-zinc-400 font-medium mr-1 hidden sm:inline">
+              Scroll board:
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => scrollPipeline("left")}
+              title="Scroll left"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => scrollPipeline("right")}
+              title="Scroll right"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
+      </div>
 
       {activeTab === "pipeline" ? (
         /* Kanban Board - Fluid Horizontal Scroll */
-        <div className="flex gap-4 overflow-x-auto pb-6 pt-1 scrollbar-thin items-start -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div
+          ref={pipelineScrollRef}
+          className="flex gap-4 overflow-x-auto pb-6 pt-1 scroll-smooth items-start -mx-4 px-4 sm:mx-0 sm:px-0"
+        >
           {kanbanColumns.map((stage) => {
             const stageCandidates = candidates.filter((c) => c.stage === stage);
             return (
@@ -167,34 +213,39 @@ export default function RecruitmentPage() {
                         </p>
                       )}
 
-                      <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-2">
-                        <span className="text-[10px] text-zinc-500 font-mono">
-                          {formatDate(c.appliedDate)}
-                        </span>
-
-                        <div className="flex items-center gap-1.5">
-                          <select
-                            value={c.stage}
-                            onChange={(e) =>
-                              handleStageChange(c.id, e.target.value, c.name)
-                            }
-                            className="text-[11px] bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-lg border border-zinc-300 dark:border-zinc-700 px-2 py-1 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
-                          >
-                            {kanbanColumns.map((st) => (
-                              <option key={st} value={st}>
-                                Move: {st}
-                              </option>
-                            ))}
-                          </select>
+                      <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono flex items-center gap-1">
+                            <span className="text-zinc-400">Applied:</span>
+                            <span className="text-zinc-700 dark:text-zinc-300 font-medium">
+                              {formatDate(c.appliedDate)}
+                            </span>
+                          </div>
 
                           <button
                             type="button"
                             onClick={() => handleDeleteCandidate(c.id, c.name)}
                             title="Remove candidate"
-                            className="p-1 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                            className="p-1 rounded-md text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
+                        </div>
+
+                        <div>
+                          <select
+                            value={c.stage}
+                            onChange={(e) =>
+                              handleStageChange(c.id, e.target.value, c.name)
+                            }
+                            className="w-full text-[11px] bg-zinc-100 dark:bg-zinc-800/90 hover:bg-zinc-200/70 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-lg border border-zinc-200 dark:border-zinc-700/80 px-2.5 py-1.5 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer transition-colors"
+                          >
+                            {kanbanColumns.map((st) => (
+                              <option key={st} value={st}>
+                                Move to: {st}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                     </Card>

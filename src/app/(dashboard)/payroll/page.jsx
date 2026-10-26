@@ -84,7 +84,7 @@ export default function PayrollPage() {
       employeeCount: "Headcount",
       processedBy: "Processed By",
     });
-    notifySuccess("Export Ready", `Exported batch ${run.id} to CSV.`);
+    notifySuccess("Export Ready", `Exported direct deposit file for batch ${run.id}.`);
   };
 
   return (
@@ -219,7 +219,7 @@ export default function PayrollPage() {
                             icon={Download}
                             onClick={() => handleExportPayroll(r)}
                           >
-                            NACHA
+                            Direct Deposit
                           </Button>
                         </div>
                       </TableCell>

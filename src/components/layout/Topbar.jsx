@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, Sun, Moon, Search, Command, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
+import { useNotification } from "@/context/NotificationContext";
 import { RoleSwitcher } from "./RoleSwitcher";
 import { Button } from "@/components/ui/Button";
 
@@ -13,6 +14,22 @@ export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const { signOut } = useAuth();
+  const { notifySuccess } = useNotification();
+
+  useEffect(() => {
+    try {
+      const flash = sessionStorage.getItem("hcm_role_login_flash");
+      if (flash) {
+        sessionStorage.removeItem("hcm_role_login_flash");
+        const parsed = JSON.parse(flash);
+        if (parsed?.message) {
+          notifySuccess("Authentication Success", parsed.message);
+        }
+      }
+    } catch (e) {
+      // Ignore sessionStorage errors
+    }
+  }, [notifySuccess]);
 
   const handleSignOut = async () => {
     try {

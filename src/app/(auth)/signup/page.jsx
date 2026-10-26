@@ -18,7 +18,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
-import { ROLES, DEPARTMENTS } from "@/lib/constants";
+import { ROLES, DEPARTMENTS, normalizeRole, ROLE_LABELS } from "@/lib/constants";
 import { isLiveFirebaseConfigured } from "@/lib/firebase/client";
 
 export default function SignUpPage() {
@@ -97,8 +97,23 @@ export default function SignUpPage() {
         jobTitle: formData.jobTitle.trim() || `${formData.role} Member`,
       });
 
-      notifySuccess("Account Created", "Your HCM Lite account has been initialized successfully.");
-      router.push("/dashboard");
+      const roleLabel = ROLE_LABELS[normalizeRole(formData.role)] || "Employee";
+      const loginMsg = `Logged in successfully as ${roleLabel}`;
+      try {
+        sessionStorage.setItem(
+          "hcm_role_login_flash",
+          JSON.stringify({ role: roleLabel, message: loginMsg })
+        );
+      } catch (e) {}
+      notifySuccess("Account Created", loginMsg);
+
+      const targetPath =
+        formData.role === ROLES.ADMIN
+          ? "/admin"
+          : formData.role === ROLES.HR
+          ? "/hr"
+          : "/employee";
+      router.push(targetPath);
     } catch (err) {
       console.error("[SignUp] Error:", err);
       let errorMsg = err.message || "Failed to create account.";

@@ -9,7 +9,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { DEMO_USERS } from "@/services/authService";
-import { normalizeRole } from "@/lib/constants";
+import { normalizeRole, ROLE_LABELS } from "@/lib/constants";
 import { setupService } from "@/services/setupService";
 import { employeeService } from "@/services/employeeService";
 import { ForcePasswordChangeModal } from "@/components/auth/ForcePasswordChangeModal";
@@ -58,8 +58,17 @@ export default function LoginPage() {
         return;
       }
 
+      const roleLabel = ROLE_LABELS[normalizeRole(authUser?.role)] || "Employee";
+      const loginMsg = `Logged in successfully as ${roleLabel}`;
+      try {
+        sessionStorage.setItem(
+          "hcm_role_login_flash",
+          JSON.stringify({ role: roleLabel, message: loginMsg })
+        );
+      } catch (e) {}
+      notifySuccess("Authentication Success", loginMsg);
+
       const dest = getRoleDashboard(authUser?.role);
-      notifySuccess("Welcome back", `Signed in as ${authUser?.displayName || "User"}`);
       router.push(dest);
     } catch (err) {
       let rawMsg = (err.message || "").toLowerCase();
@@ -94,6 +103,9 @@ export default function LoginPage() {
 
     try {
       const canonical = normalizeRole(demoUser.role);
+      const roleLabel = ROLE_LABELS[canonical] || "Employee";
+      const loginMsg = `Logged in successfully as ${roleLabel}`;
+
       // If live Firebase is configured, authentic sign in via verified demo persona credentials
       if (isLiveFirebaseConfigured) {
         const emailMap = {
@@ -104,20 +116,41 @@ export default function LoginPage() {
         const targetEmail = emailMap[canonical] || demoUser.email;
         const authUser = await signIn(targetEmail, "Password123!");
         const dest = getRoleDashboard(authUser?.role || canonical);
-        notifySuccess(`Logged in as ${authUser?.displayName || demoUser.displayName}`, `Role: ${authUser?.role || canonical}`);
+        try {
+          sessionStorage.setItem(
+            "hcm_role_login_flash",
+            JSON.stringify({ role: roleLabel, message: loginMsg })
+          );
+        } catch (e) {}
+        notifySuccess("Authentication Success", loginMsg);
         router.push(dest);
         return;
       }
 
       await switchDemoRole(demoUser.role);
       const dest = getRoleDashboard(demoUser.role);
-      notifySuccess(`Logged in as ${demoUser.displayName}`, `Role: ${demoUser.role}`);
+      try {
+        sessionStorage.setItem(
+          "hcm_role_login_flash",
+          JSON.stringify({ role: roleLabel, message: loginMsg })
+        );
+      } catch (e) {}
+      notifySuccess("Authentication Success", loginMsg);
       router.push(dest);
     } catch (err) {
       console.warn("Live persona switch note:", err);
+      const canonical = normalizeRole(demoUser.role);
+      const roleLabel = ROLE_LABELS[canonical] || "Employee";
+      const loginMsg = `Logged in successfully as ${roleLabel}`;
       await switchDemoRole(demoUser.role);
       const dest = getRoleDashboard(demoUser.role);
-      notifySuccess(`Logged in as ${demoUser.displayName}`, `Role: ${demoUser.role}`);
+      try {
+        sessionStorage.setItem(
+          "hcm_role_login_flash",
+          JSON.stringify({ role: roleLabel, message: loginMsg })
+        );
+      } catch (e) {}
+      notifySuccess("Authentication Success", loginMsg);
       router.push(dest);
     } finally {
       setLoading(false);
@@ -136,8 +169,16 @@ export default function LoginPage() {
       }
       switchDemoRole(pendingUser.role);
     }
+    const roleLabel = ROLE_LABELS[normalizeRole(pendingUser?.role)] || "Employee";
+    const loginMsg = `Logged in successfully as ${roleLabel}`;
+    try {
+      sessionStorage.setItem(
+        "hcm_role_login_flash",
+        JSON.stringify({ role: roleLabel, message: loginMsg })
+      );
+    } catch (e) {}
     const dest = getRoleDashboard(pendingUser?.role);
-    notifySuccess("Password Updated & Account Activated", "Welcome to HCM Lite! Access granted to dashboard.");
+    notifySuccess("Authentication Success", loginMsg);
     router.push(dest);
   };
 
