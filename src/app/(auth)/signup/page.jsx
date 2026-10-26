@@ -110,6 +110,15 @@ export default function SignUpPage() {
       const loginMsg = `Logged in successfully as ${roleLabel}`;
       try {
         sessionStorage.setItem(
+          "hcm_role_login_popup",
+          JSON.stringify({
+            role: roleLabel,
+            name: formData.displayName.trim(),
+            email: formData.email.trim(),
+            message: loginMsg,
+          })
+        );
+        sessionStorage.setItem(
           "hcm_role_login_flash",
           JSON.stringify({ role: roleLabel, message: loginMsg })
         );

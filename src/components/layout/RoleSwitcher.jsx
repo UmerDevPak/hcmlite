@@ -46,7 +46,20 @@ export function RoleSwitcher() {
   const currentRoleObj = roles.find((r) => r.id === activeRoleCanonical) || roles[0];
   const CurrentIcon = currentRoleObj.icon;
 
+  // Only permit role switching if logged in as a demo account
+  const isDemoAccount = Boolean(
+    user?.isDemoUser ||
+    (user?.email && (
+      user.email.endsWith(".internal") ||
+      user.email.includes("demo") ||
+      user.email === "admin@hcmlite.internal" ||
+      user.email === "hr@hcmlite.internal" ||
+      user.email === "employee@hcmlite.internal"
+    ))
+  );
+
   const handleRoleSelect = async (roleObj) => {
+    if (!isDemoAccount) return;
     setIsOpen(false);
     if (roleObj.id === activeRoleCanonical) {
       router.push(roleObj.path);
@@ -62,6 +75,23 @@ export function RoleSwitcher() {
     }
   };
 
+  // Restricted view for non-demo accounts: static badge showing ONLY active role
+  if (!isDemoAccount) {
+    return (
+      <div
+        title={`Verified Role: ${currentRoleObj.label} (Protected session - role switching restricted)`}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/80 text-xs font-medium text-zinc-700 dark:text-zinc-200 cursor-default select-none shadow-sm"
+      >
+        <CurrentIcon className={cn("w-3.5 h-3.5", currentRoleObj.color)} />
+        <span className="hidden sm:inline text-zinc-400">Role:</span>
+        <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+          {currentRoleObj.label}
+        </span>
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 ml-0.5" title="Verified Session" />
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       <button
@@ -72,6 +102,9 @@ export function RoleSwitcher() {
         <span className="hidden sm:inline">Role:</span>
         <span className="font-semibold text-zinc-900 dark:text-zinc-100">
           {currentRoleObj.label}
+        </span>
+        <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1 py-0.2 rounded font-mono uppercase">
+          Demo
         </span>
         <ChevronDown className="w-3.5 h-3.5 text-zinc-400 ml-0.5" />
       </button>

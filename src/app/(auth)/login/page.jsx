@@ -20,12 +20,20 @@ export default function LoginPage() {
   const { user, loading: authLoading, signIn, switchDemoRole } = useAuth();
   const { notifySuccess, notifyError } = useNotification();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [selectedRole, setSelectedRole] = useState("ADMIN");
+  const [email, setEmail] = useState("admin@hcmlite.internal");
+  const [password, setPassword] = useState("Password123!");
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [pendingUser, setPendingUser] = useState(null);
   const [showForcePasswordModal, setShowForcePasswordModal] = useState(false);
+
+  const handleSelectRole = (roleId, defaultEmail) => {
+    setSelectedRole(roleId);
+    setEmail(defaultEmail);
+    setPassword("Password123!");
+    setLoginError("");
+  };
 
   // If already authenticated, cannot return to /login
   useEffect(() => {
@@ -66,9 +74,18 @@ export default function LoginPage() {
         return;
       }
 
-      const roleLabel = ROLE_LABELS[normalizeRole(authUser?.role)] || "Employee";
+      const roleLabel = ROLE_LABELS[normalizeRole(authUser?.role || selectedRole)] || "Employee";
       const loginMsg = `Logged in successfully as ${roleLabel}`;
       try {
+        sessionStorage.setItem(
+          "hcm_role_login_popup",
+          JSON.stringify({
+            role: roleLabel,
+            name: authUser?.displayName || roleLabel,
+            email: authUser?.email || email,
+            message: loginMsg,
+          })
+        );
         sessionStorage.setItem(
           "hcm_role_login_flash",
           JSON.stringify({ role: roleLabel, message: loginMsg })
@@ -126,6 +143,15 @@ export default function LoginPage() {
         const dest = getRoleDashboard(authUser?.role || canonical);
         try {
           sessionStorage.setItem(
+            "hcm_role_login_popup",
+            JSON.stringify({
+              role: roleLabel,
+              name: authUser?.displayName || demoUser.displayName || roleLabel,
+              email: authUser?.email || targetEmail,
+              message: loginMsg,
+            })
+          );
+          sessionStorage.setItem(
             "hcm_role_login_flash",
             JSON.stringify({ role: roleLabel, message: loginMsg })
           );
@@ -138,6 +164,15 @@ export default function LoginPage() {
       await switchDemoRole(demoUser.role);
       const dest = getRoleDashboard(demoUser.role);
       try {
+        sessionStorage.setItem(
+          "hcm_role_login_popup",
+          JSON.stringify({
+            role: roleLabel,
+            name: demoUser.displayName || roleLabel,
+            email: demoUser.email,
+            message: loginMsg,
+          })
+        );
         sessionStorage.setItem(
           "hcm_role_login_flash",
           JSON.stringify({ role: roleLabel, message: loginMsg })
@@ -153,6 +188,15 @@ export default function LoginPage() {
       await switchDemoRole(demoUser.role);
       const dest = getRoleDashboard(demoUser.role);
       try {
+        sessionStorage.setItem(
+          "hcm_role_login_popup",
+          JSON.stringify({
+            role: roleLabel,
+            name: demoUser.displayName || roleLabel,
+            email: demoUser.email,
+            message: loginMsg,
+          })
+        );
         sessionStorage.setItem(
           "hcm_role_login_flash",
           JSON.stringify({ role: roleLabel, message: loginMsg })
@@ -180,6 +224,15 @@ export default function LoginPage() {
     const roleLabel = ROLE_LABELS[normalizeRole(pendingUser?.role)] || "Employee";
     const loginMsg = `Logged in successfully as ${roleLabel}`;
     try {
+      sessionStorage.setItem(
+        "hcm_role_login_popup",
+        JSON.stringify({
+          role: roleLabel,
+          name: pendingUser?.displayName || roleLabel,
+          email: pendingUser?.email,
+          message: loginMsg,
+        })
+      );
       sessionStorage.setItem(
         "hcm_role_login_flash",
         JSON.stringify({ role: roleLabel, message: loginMsg })
@@ -245,6 +298,68 @@ export default function LoginPage() {
             </p>
           </div>
 
+          {/* Who is logging in? Role Selector */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider block">
+                Who is logging in?
+              </label>
+              <span className="text-[10px] text-zinc-500">
+                Select your designated role
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2.5">
+              {[
+                {
+                  id: "ADMIN",
+                  label: "Admin",
+                  desc: "Full Control",
+                  icon: ShieldCheck,
+                  email: "admin@hcmlite.internal",
+                  activeBorder: "border-indigo-500 bg-indigo-500/10 text-indigo-300 ring-1 ring-indigo-500/40",
+                  activeIcon: "text-indigo-400",
+                },
+                {
+                  id: "HR",
+                  label: "HR",
+                  desc: "People Ops",
+                  icon: UserCheck,
+                  email: "hr@hcmlite.internal",
+                  activeBorder: "border-emerald-500 bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/40",
+                  activeIcon: "text-emerald-400",
+                },
+                {
+                  id: "EMPLOYEE",
+                  label: "Employee",
+                  desc: "Self-Service",
+                  icon: User,
+                  email: "employee@hcmlite.internal",
+                  activeBorder: "border-cyan-500 bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-500/40",
+                  activeIcon: "text-cyan-400",
+                },
+              ].map((item) => {
+                const Icon = item.icon;
+                const isSelected = selectedRole === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleSelectRole(item.id, item.email)}
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-200 active:scale-[0.98] ${
+                      isSelected
+                        ? item.activeBorder
+                        : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 mb-1.5 ${isSelected ? item.activeIcon : "text-zinc-400"}`} />
+                    <span className="font-bold text-xs">{item.label}</span>
+                    <span className="text-[10px] text-zinc-500 mt-0.5">{item.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Quick Demo Personas (1-Click evaluation) */}
           <div className="p-4 rounded-xl border border-indigo-500/30 bg-indigo-950/20 space-y-3">
             <div className="flex items-center justify-between">
@@ -264,18 +379,7 @@ export default function LoginPage() {
                     : canonical === "HR"
                     ? UserCheck
                     : User;
-                if (!authLoading && user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-400">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs font-mono text-zinc-500">Already authenticated. Redirecting to dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
+                return (
                   <button
                     key={u.uid}
                     type="button"

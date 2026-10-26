@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { CommandPalette } from "@/components/layout/CommandPalette";
+import { LoginSuccessModal } from "@/components/auth/LoginSuccessModal";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
 import { normalizeRole } from "@/lib/constants";
@@ -136,6 +137,9 @@ export default function DashboardLayout({ children }) {
           <div className="mx-auto max-w-7xl space-y-8">{children}</div>
         </main>
       </div>
+
+      {/* Login Role Confirmation Modal Popup */}
+      <LoginSuccessModal />
 
       {/* Global Command Palette */}
       <CommandPalette
