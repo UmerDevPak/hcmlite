@@ -57,8 +57,13 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const { user, loading } = useAuth();
   const { notifyError } = useNotification();
+  const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Keyboard shortcut for Cmd+K / Ctrl+K
   useEffect(() => {
@@ -74,23 +79,23 @@ export default function DashboardLayout({ children }) {
 
   // 1. Protect dashboard routes: redirect unauthenticated sessions to /login
   useEffect(() => {
-    if (!loading && !user) {
+    if (mounted && !loading && !user) {
       router.replace("/login");
     }
-  }, [user, loading, router]);
+  }, [user, loading, mounted, router]);
 
   // 2. Role-based Route Protection
   const userRole = normalizeRole(user?.role);
   const routeAccess = getRouteAccess(pathname, userRole);
 
   useEffect(() => {
-    if (!loading && user && !routeAccess.authorized) {
+    if (mounted && !loading && user && !routeAccess.authorized) {
       notifyError("Access Denied", routeAccess.reason);
       router.replace(routeAccess.redirectPath);
     }
-  }, [user, loading, routeAccess.authorized, routeAccess.redirectPath, routeAccess.reason, router, notifyError]);
+  }, [user, loading, mounted, routeAccess.authorized, routeAccess.redirectPath, routeAccess.reason, router, notifyError]);
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-400">
         <div className="flex flex-col items-center gap-3">
@@ -119,12 +124,20 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+    <div className="relative flex min-h-screen bg-zinc-950 text-zinc-100 overflow-hidden">
+      {/* Global Enterprise Network Mesh Background (Reference Image 3 - Harmonized to Dark Theme) */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-right-bottom bg-no-repeat opacity-[0.16] mix-blend-screen transition-opacity duration-1000"
+        style={{ backgroundImage: `url('/images/dashboard-network-mesh.jpg')` }}
+      />
+      {/* Dark gradient vignette ensuring full WCAG AAA text legibility & layout preservation */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-gradient-to-tr from-zinc-950 via-zinc-950/75 to-transparent" />
+
       {/* Sidebar navigation */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main app container */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
         <Topbar
           onOpenSidebar={() => setSidebarOpen(true)}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}

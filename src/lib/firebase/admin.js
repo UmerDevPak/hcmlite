@@ -36,11 +36,17 @@ export function getAdminApp() {
 }
 
 export const getAdminAuth = () => {
+  if (!projectId || !clientEmail || !privateKey) {
+    return null;
+  }
   const app = getAdminApp();
   return app ? admin.auth(app) : null;
 };
 
 export const getAdminFirestore = () => {
+  if (!projectId || !clientEmail || !privateKey) {
+    return null;
+  }
   const app = getAdminApp();
   return app ? admin.firestore(app) : null;
 };

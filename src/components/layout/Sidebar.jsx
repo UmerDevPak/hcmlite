@@ -19,6 +19,7 @@ import {
   Building2,
   Sparkles,
   User,
+  ShieldAlert,
   X,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -64,6 +65,7 @@ export function Sidebar({ isOpen, onClose }) {
         { name: "Audit Log & Reports", href: "/reports", icon: BarChart3 },
         { name: "Documents", href: "/documents", icon: FileText },
         { name: "Recruitment (ATS)", href: "/recruitment", icon: Briefcase },
+        { name: "Grievances & Complaints", href: "/complaints", icon: ShieldAlert },
       ],
     },
   ];
@@ -89,6 +91,7 @@ export function Sidebar({ isOpen, onClose }) {
         { name: "Monthly Payroll Draft", href: "/payroll", icon: CreditCard },
         { name: "Announcements & Docs", href: "/documents", icon: FileText },
         { name: "Recruitment (ATS)", href: "/recruitment", icon: Briefcase },
+        { name: "Grievances & Complaints", href: "/complaints", icon: ShieldAlert },
       ],
     },
   ];
@@ -101,6 +104,7 @@ export function Sidebar({ isOpen, onClose }) {
         { name: "My Attendance", href: "/attendance", icon: Clock },
         { name: "Apply Leave", href: "/leave", icon: CalendarDays },
         { name: "My Payslips", href: "/employee", icon: CreditCard },
+        { name: "Grievances & Complaints", href: "/complaints", icon: ShieldAlert },
         { name: "My Profile", href: "/profile", icon: User },
       ],
     },

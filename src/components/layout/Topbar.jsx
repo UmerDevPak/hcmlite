@@ -2,12 +2,13 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, Sun, Moon, Search, Command, LogOut, User } from "lucide-react";
+import { Menu, Sun, Moon, Search, Command, LogOut, User, Building2 } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
 import { RoleSwitcher } from "./RoleSwitcher";
+import { NotificationCenter } from "./NotificationCenter";
 import { Button } from "@/components/ui/Button";
 
 export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
@@ -42,7 +43,7 @@ export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 px-4 sm:px-6 backdrop-blur-md">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
         {/* Mobile menu trigger */}
         <button
           onClick={onOpenSidebar}
@@ -50,6 +51,16 @@ export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
         >
           <Menu className="w-5 h-5" />
         </button>
+
+        {/* Mobile App Branding Logo */}
+        <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
+          <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-glow">
+            <Building2 className="w-3.5 h-3.5" />
+          </div>
+          <span className="font-bold text-sm tracking-tight text-zinc-900 dark:text-zinc-100">
+            HCM Lite
+          </span>
+        </Link>
 
         {/* Global Quick Search Button (Linear style Cmd+K) */}
         <button
@@ -66,8 +77,9 @@ export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
         </button>
       </div>
 
-      {/* Right controls: Theme toggle, Role Switcher */}
-      <div className="flex items-center gap-3">
+      {/* Right controls: Notifications, Role indicator, Profile, Theme toggle */}
+      <div className="flex items-center gap-2.5">
+        <NotificationCenter />
         <RoleSwitcher />
 
         {/* My Profile Link */}

@@ -21,38 +21,24 @@ const AuthContext = createContext({
 });
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem("hcm_lite_cached_session");
-        if (cached) return JSON.parse(cached);
-      } catch (e) {}
-    }
-    return null;
-  });
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(ROLES.EMPLOYEE);
+  const [loading, setLoading] = useState(true);
 
-  const [role, setRole] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem("hcm_lite_cached_session");
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed?.role) return normalizeRole(parsed.role);
+  // Client-side session hydration
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem("hcm_lite_cached_session");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed) {
+          setUser(parsed);
+          if (parsed.role) setRole(normalizeRole(parsed.role));
+          setLoading(false);
         }
-      } catch (e) {}
-    }
-    return ROLES.EMPLOYEE;
-  });
-
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem("hcm_lite_cached_session");
-        if (cached) return false;
-      } catch (e) {}
-    }
-    return true;
-  });
+      }
+    } catch (e) {}
+  }, []);
 
   // Safety timeout: Ensure page loading never hangs on slow network / cold start
   useEffect(() => {

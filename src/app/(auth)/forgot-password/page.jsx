@@ -41,15 +41,31 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-zinc-950 text-zinc-100">
-      <div className="w-full max-w-md space-y-6">
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to sign in
-        </Link>
+    <div className="relative min-h-screen flex items-center justify-center p-6 bg-zinc-950 text-zinc-100 overflow-hidden">
+      {/* Fluid Background Graphic (Reference Image 4 / Mockup Image 2) */}
+      <div
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700"
+        style={{ backgroundImage: `url('/images/auth-fluid-dark.jpg')` }}
+      />
+      <div className="fixed inset-0 z-0 bg-gradient-to-t from-zinc-950/85 via-zinc-950/60 to-zinc-950/70 pointer-events-none" />
+
+      <div className="relative z-10 w-full max-w-md space-y-6 rounded-2xl sm:rounded-3xl border border-zinc-800/80 bg-zinc-950/85 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl">
+        <div className="flex items-center justify-between">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to sign in
+          </Link>
+
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-glow">
+              <Building2 className="w-3.5 h-3.5" />
+            </div>
+            <span className="font-bold text-sm text-zinc-100">HCM Lite</span>
+          </div>
+        </div>
 
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Reset password</h2>
