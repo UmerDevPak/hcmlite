@@ -148,13 +148,13 @@ export function WorkforceDistributionChart({ departmentStats = [], totalHeadcoun
         {chartMode === "bar" ? (
           <motion.div
             key="bar"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-            className="h-64 w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="w-full"
           >
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={240}>
               <BarChart
                 data={chartData}
                 layout="vertical"
@@ -180,7 +180,7 @@ export function WorkforceDistributionChart({ departmentStats = [], totalHeadcoun
                   dataKey="percent"
                   radius={[0, 6, 6, 0]}
                   isAnimationActive={true}
-                  animationDuration={700}
+                  animationDuration={450}
                 >
                   {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fillColor} />
@@ -192,14 +192,14 @@ export function WorkforceDistributionChart({ departmentStats = [], totalHeadcoun
         ) : (
           <motion.div
             key="pie"
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            transition={{ duration: 0.25 }}
-            className="h-64 w-full flex flex-col md:flex-row items-center justify-between"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="w-full flex flex-col md:flex-row items-center justify-between"
           >
-            <div className="h-full w-full md:w-1/2">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="w-full md:w-1/2">
+              <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
                   <Tooltip content={<CustomPieTooltip />} />
                   <Pie
@@ -212,7 +212,7 @@ export function WorkforceDistributionChart({ departmentStats = [], totalHeadcoun
                     outerRadius={80}
                     paddingAngle={3}
                     isAnimationActive={true}
-                    animationDuration={800}
+                    animationDuration={450}
                   >
                     {chartData.map((entry, index) => (
                       <Cell

@@ -80,7 +80,7 @@ export function WorkforceTenureChart({ tenureStats = {}, totalEmployees = 8 }) {
     <div className="space-y-4">
       {/* Visual Donut Ring */}
       <div className="h-40 w-full relative">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={160}>
           <PieChart>
             <Tooltip content={<CustomTenureTooltip />} />
             <Pie
@@ -93,7 +93,7 @@ export function WorkforceTenureChart({ tenureStats = {}, totalEmployees = 8 }) {
               outerRadius={66}
               paddingAngle={4}
               isAnimationActive={true}
-              animationDuration={800}
+              animationDuration={450}
             >
               {data.map((entry, index) => (
                 <Cell
