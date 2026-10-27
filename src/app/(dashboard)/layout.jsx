@@ -124,7 +124,7 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="relative flex min-h-screen bg-zinc-950 text-zinc-100 overflow-hidden">
+    <div className="relative flex min-h-screen bg-zinc-950 text-zinc-100 overflow-x-hidden w-full">
       {/* Global Enterprise Network Mesh Background (Reference Image 3 - Harmonized to Dark Theme) */}
       <div
         className="fixed inset-0 pointer-events-none z-0 bg-cover bg-right-bottom bg-no-repeat opacity-[0.16] mix-blend-screen transition-opacity duration-1000"
@@ -137,14 +137,14 @@ export default function DashboardLayout({ children }) {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main app container */}
-      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
+      <div className="relative z-10 flex flex-1 flex-col overflow-hidden min-w-0 w-full">
         <Topbar
           onOpenSidebar={() => setSidebarOpen(true)}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         />
 
-        <main className="flex-1 overflow-y-auto px-4 py-8 sm:px-8">
-          <div className="mx-auto max-w-7xl space-y-8">{children}</div>
+        <main className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-6 sm:px-6 sm:py-8 lg:px-8">
+          <div className="mx-auto max-w-7xl space-y-6 sm:space-y-8 min-w-0 w-full">{children}</div>
         </main>
       </div>
 

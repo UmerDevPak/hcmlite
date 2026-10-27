@@ -42,22 +42,22 @@ export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 px-4 sm:px-6 backdrop-blur-md">
-      <div className="flex items-center gap-2.5">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 px-3 sm:px-6 backdrop-blur-md">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
         {/* Mobile menu trigger */}
         <button
           onClick={onOpenSidebar}
-          className="lg:hidden p-2 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className="lg:hidden p-1.5 sm:p-2 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         {/* Mobile App Branding Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
+        <Link href="/dashboard" className="flex items-center gap-1.5 lg:hidden shrink-0">
           <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-glow">
             <Building2 className="w-3.5 h-3.5" />
           </div>
-          <span className="font-bold text-sm tracking-tight text-zinc-900 dark:text-zinc-100">
+          <span className="font-bold text-sm tracking-tight text-zinc-900 dark:text-zinc-100 hidden min-[400px]:inline">
             HCM Lite
           </span>
         </Link>
@@ -78,7 +78,7 @@ export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
       </div>
 
       {/* Right controls: Notifications, Role indicator, Profile, Theme toggle */}
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         <NotificationCenter />
         <RoleSwitcher />
 
@@ -87,7 +87,7 @@ export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
           href="/profile"
           aria-label="My Profile"
           title="View My Profile"
-          className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors"
+          className="p-1.5 sm:p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors shrink-0"
         >
           <User className="w-4 h-4" />
         </Link>
@@ -96,7 +96,7 @@ export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
         <button
           onClick={toggleTheme}
           aria-label="Toggle theme"
-          className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors"
+          className="p-1.5 sm:p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors shrink-0"
         >
           {theme === "dark" ? (
             <Sun className="w-4 h-4 text-amber-400" />

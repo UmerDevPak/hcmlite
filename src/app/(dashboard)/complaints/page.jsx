@@ -261,18 +261,18 @@ export default function ComplaintsPage() {
   return (
     <div className="space-y-8 animate-fade-in pb-16">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-zinc-900/90 via-zinc-900/50 to-zinc-950 shadow-elevated relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-zinc-900/90 via-zinc-900/50 to-zinc-950 shadow-elevated relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 space-y-2 max-w-2xl">
+        <div className="relative z-10 space-y-2 max-w-2xl min-w-0">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold">
             <ShieldAlert className="w-3.5 h-3.5" />
             <span>Corporate Grievance Redressal System</span>
             <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-100">
+          <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-zinc-100">
             Workforce Complaints & Grievances
           </h1>
 
@@ -299,7 +299,7 @@ export default function ComplaintsPage() {
           <Button
             onClick={() => setIsCreateModalOpen(true)}
             icon={Plus}
-            className="font-bold text-xs py-2.5 px-4 shadow-glow"
+            className="font-bold text-xs py-2.5 px-4 shadow-glow w-full sm:w-auto"
           >
             File New Grievance
           </Button>
@@ -307,8 +307,8 @@ export default function ComplaintsPage() {
       </div>
 
       {/* Metric KPI Overview */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm space-y-2">
+      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm space-y-2">
           <span className="text-xs font-medium text-zinc-400">Total Cases Logged</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold tracking-tight text-zinc-100">{totalCount}</span>
@@ -316,7 +316,7 @@ export default function ComplaintsPage() {
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 shadow-sm space-y-2">
+        <div className="p-4 sm:p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 shadow-sm space-y-2">
           <span className="text-xs font-medium text-amber-400">Pending HR Intake</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold tracking-tight text-amber-300">{pendingTriageCount}</span>
@@ -324,7 +324,7 @@ export default function ComplaintsPage() {
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-purple-500/20 bg-purple-500/5 shadow-sm space-y-2 relative overflow-hidden">
+        <div className="p-4 sm:p-5 rounded-2xl border border-purple-500/20 bg-purple-500/5 shadow-sm space-y-2 relative overflow-hidden">
           {escalatedToAdminCount > 0 && (
             <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-purple-500 animate-ping" />
           )}
@@ -335,7 +335,7 @@ export default function ComplaintsPage() {
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 shadow-sm space-y-2">
+        <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 shadow-sm space-y-2">
           <span className="text-xs font-medium text-emerald-400">Resolved & Closed</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold tracking-tight text-emerald-300">{resolvedCount}</span>

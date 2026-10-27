@@ -199,7 +199,7 @@ export default function EmployeeDashboardPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* 1. Header: Welcome back, Employee Name, Department & Designation */}
-      <div className="relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-indigo-950/40 border border-zinc-800 shadow-elevated">
+      <div className="relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-indigo-950/40 border border-zinc-800 shadow-elevated">
         {/* Subtle decorative vector backdrop pattern */}
         <div className="absolute inset-0 pointer-events-none opacity-20 [mask-image:radial-gradient(ellipse_at_top_right,white,transparent_75%)]">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">

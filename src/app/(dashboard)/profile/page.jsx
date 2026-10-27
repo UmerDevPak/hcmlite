@@ -134,19 +134,19 @@ export default function MyProfilePage() {
       </Link>
 
       {/* Hero 360 Header */}
-      <Card className="p-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
+      <Card className="p-4 sm:p-6 overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 min-w-0 w-full">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 min-w-0 w-full">
             <Avatar
               src={employee.avatar || user?.photoURL || user?.avatar}
               name={employee.name || user?.displayName || "User"}
               size="2xl"
               shape="square"
-              className="w-20 h-20 rounded-2xl border-2 border-indigo-500/20 shadow-md ring-2 ring-indigo-500/10"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-indigo-500/20 shadow-md ring-2 ring-indigo-500/10 shrink-0"
             />
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <div className="min-w-0 flex-1 w-full">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                <h1 className="text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 truncate">
                   {employee.name}
                 </h1>
                 <Badge
@@ -161,27 +161,27 @@ export default function MyProfilePage() {
                 >
                   {employee.status || "Active"}
                 </Badge>
-                <span className="text-xs px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 font-medium">
+                <span className="text-xs px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 font-medium shrink-0">
                   {ROLE_LABELS[employee.role] || employee.role}
                 </span>
               </div>
 
-              <p className="text-sm font-medium text-indigo-500 dark:text-indigo-400 mt-0.5">
+              <p className="text-xs sm:text-sm font-medium text-indigo-500 dark:text-indigo-400 mt-1 truncate">
                 {employee.jobTitle} • {employee.department}
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400 mt-2">
-                <span className="flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5" />
-                  {employee.email}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-2">
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <Mail className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate max-w-[210px] sm:max-w-none">{employee.email}</span>
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5" />
-                  {employee.location || "San Francisco, CA (HQ)"}
+                  <MapPin className="w-3.5 h-3.5 shrink-0" />
+                  <span>{employee.location || "San Francisco, CA (HQ)"}</span>
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />
-                  Hired {formatDate(employee.hireDate)}
+                  <Calendar className="w-3.5 h-3.5 shrink-0" />
+                  <span>Hired {formatDate(employee.hireDate)}</span>
                 </span>
                 <span className="font-mono text-zinc-400">
                   ID: {employee.id}

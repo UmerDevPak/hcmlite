@@ -102,16 +102,16 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* 1. Header: Company overview, quick status, and settings shortcut */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-indigo-950/40 border border-zinc-800 shadow-elevated">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-glow">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-indigo-950/40 border border-zinc-800 shadow-elevated">
+        <div className="space-y-1.5 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-glow shrink-0">
               <Building2 className="w-4 h-4" />
             </div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-50">
               Enterprise Admin Portal
             </h1>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Live System Active
             </span>
@@ -121,7 +121,7 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 shrink-0">
           <Link href="/settings">
             <Button variant="outline" size="sm" icon={Settings}>
               Organization Setup

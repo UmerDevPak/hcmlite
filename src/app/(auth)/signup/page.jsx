@@ -274,8 +274,8 @@ export default function SignUpPage() {
       </div>
 
       {/* Right sign up form - Floating Glassmorphic Card (matching Image 2) */}
-      <div className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12 overflow-y-auto">
-        <div className="w-full max-w-lg space-y-6 rounded-2xl sm:rounded-3xl border border-zinc-800/80 bg-zinc-950/85 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl my-6">
+      <div className="relative z-10 flex-1 flex items-center justify-center p-3 sm:p-8 lg:p-12 overflow-y-auto">
+        <div className="w-full max-w-lg space-y-6 rounded-2xl sm:rounded-3xl border border-zinc-800/80 bg-zinc-950/85 backdrop-blur-2xl p-4 sm:p-8 shadow-2xl my-4 sm:my-6">
           {/* Mobile branding header (visible on phone / tablet < lg) */}
           <div className="flex items-center gap-3 lg:hidden pb-1">
             <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-glow shrink-0">

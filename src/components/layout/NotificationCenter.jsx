@@ -136,9 +136,20 @@ export function NotificationCenter() {
         )}
       </button>
 
-      {/* Floating Dropdown Panel */}
+      {/* Mobile Backdrop Overlay */}
       {isOpen && (
-        <div className="absolute right-0 mt-2.5 w-96 max-w-[calc(100vw-2rem)] rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 shadow-2xl backdrop-blur-xl z-50 animate-scale-in flex flex-col max-h-[85vh] overflow-hidden">
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 sm:hidden"
+          onClick={() => {
+            setIsOpen(false);
+            setShowSimulator(false);
+          }}
+        />
+      )}
+
+      {/* Floating Dropdown Panel (Responsive Fixed on Mobile, Absolute on Desktop) */}
+      {isOpen && (
+        <div className="fixed inset-x-2 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2.5 w-auto sm:w-96 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 shadow-2xl backdrop-blur-xl z-50 animate-scale-in flex flex-col max-h-[80vh] sm:max-h-[85vh] overflow-hidden">
           {/* Header */}
           <div className="p-3.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/40">
             <div className="flex items-center gap-2">
@@ -187,7 +198,7 @@ export function NotificationCenter() {
                 <span>Interactive Enterprise Activity Simulator:</span>
                 <span className="text-[10px] text-zinc-400 font-mono">1-Click Live Test</span>
               </div>
-              <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+              <div className="grid grid-cols-1 min-[340px]:grid-cols-2 gap-1.5 text-[11px]">
                 <button
                   onClick={() => handleSimulate("ADMIN_PAYROLL")}
                   className="p-1.5 rounded-lg border border-indigo-500/30 bg-zinc-900/90 hover:bg-indigo-900/40 text-left truncate text-indigo-300 transition-colors"
