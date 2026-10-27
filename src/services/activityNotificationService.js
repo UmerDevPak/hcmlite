@@ -1,3 +1,15 @@
+/**
+ * @file activityNotificationService.js
+ * @description Centralized Activity Stream & Notification Broadcast Engine
+ * 
+ * Tracks system-wide events triggered by Admin, HR, and Employees:
+ * - ADMIN: Finalizes payroll, approves escalated grievances, updates org settings.
+ * - HR: Approves/rejects leaves, logs candidate hires, investigates complaints.
+ * - EMPLOYEE: Submits leave requests, clocks in/out, files confidential grievances.
+ * 
+ * Drives the NotificationCenter bell badge in Topbar with real-time browser storage events.
+ */
+
 import { generateId, formatDate } from "@/lib/utils";
 
 const STORAGE_KEY = "hcm_lite_activity_notifications";

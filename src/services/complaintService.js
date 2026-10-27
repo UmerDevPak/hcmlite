@@ -1,3 +1,17 @@
+/**
+ * @file complaintService.js
+ * @description Enterprise Grievance & Whistleblower Resolution Pipeline
+ * 
+ * WORKFLOW LIFECYCLE:
+ * 1. EMPLOYEE: Submits complaint (confidential or anonymous) -> Status: PENDING_HR
+ * 2. HR PARTNER: Triage & investigation -> Status: INVESTIGATING
+ * 3. HR PARTNER: If executive sign-off or budget required -> Escalates to Admin -> Status: ESCALATED_TO_ADMIN
+ * 4. ADMIN: Reviews case findings, budget, or policy -> Approves/Rejects -> Status: APPROVED_BY_ADMIN
+ * 5. HR / ADMIN: Executes remediation and closes case -> Status: RESOLVED
+ * 
+ * Broadcasts system-wide audit notifications via activityNotificationService.
+ */
+
 import { activityNotificationService } from "./activityNotificationService";
 import { formatDate } from "@/lib/utils";
 

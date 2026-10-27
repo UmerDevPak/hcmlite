@@ -1,3 +1,15 @@
+/**
+ * @file leaveService.js
+ * @description Statutory Leave Management & Approval Engine
+ * 
+ * ENTITLEMENT POLICY:
+ * - Annual Leave: 14 days statutory quota
+ * - Sick Leave: 8 days medical coverage
+ * - Casual Leave: 10 days short-notice emergency quota
+ * - Auto-Deduction: When HR/Manager approves a request, days are decremented automatically.
+ * - Confetti & Notifications: Approval triggers UI confetti and logs activity stream events.
+ */
+
 import { LEAVE_STATUS, LEAVE_QUOTAS, LEAVE_TYPES } from "@/lib/constants";
 import { calculateWorkingDays } from "@/lib/utils";
 import { isLiveFirebaseConfigured, db } from "@/lib/firebase/client";

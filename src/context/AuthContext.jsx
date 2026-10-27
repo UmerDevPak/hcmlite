@@ -1,5 +1,17 @@
 "use client";
 
+/**
+ * @file AuthContext.jsx
+ * @description Central Authentication & RBAC Session Provider
+ * 
+ * CORE RESPONSIBILITIES:
+ * 1. Hybrid Auth: Integrates Firebase Authentication with offline/demo localStorage cache.
+ * 2. Role Normalization: Resolves raw roles into canonical values (ADMIN, HR, EMPLOYEE).
+ * 3. Strict Role-Verified Login: Blocks login if user selects a role that doesn't match their account.
+ * 4. Force Password Change: Detects temporary initial credentials and prompts user to set new password.
+ * 5. Persona Switching: Enables instant 1-click persona switching for fast demo evaluation.
+ */
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth, isLiveFirebaseConfigured } from "@/lib/firebase/client";
 import { DEMO_USERS, findDemoUser, authService } from "@/services/authService";

@@ -1,3 +1,15 @@
+/**
+ * @file payrollService.js
+ * @description Enterprise Payroll Engine & Gross-to-Net Tax Calculation
+ * 
+ * FORMULA & TAX SLABS:
+ * - Gross = Basic * 1.5 (incorporates 40% HRA, 10% Medical allowance)
+ * - Per-day wage = Gross / Working Days (default: 22 days)
+ * - Attendance Deductions = Absent days + Unpaid leave + (0.5 * Half days)
+ * - Tax Slabs (Annualized): 0-100k: 10%, 100k-200k: 20%, 200k+: 30%
+ * - Disbursal: Direct deposit generation, payslip vouchers, CSV file export.
+ */
+
 import { INITIAL_PAYROLL_RUNS, INITIAL_EMPLOYEES } from "@/lib/seedData";
 import { calculatePayrollBreakdown } from "@/lib/utils";
 import { OFFICE_SETUP } from "@/lib/constants";
