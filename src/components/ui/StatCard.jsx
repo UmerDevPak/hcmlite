@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,7 @@ export function StatCard({
   iconColor = "text-indigo-500",
   iconBg = "bg-indigo-500/10",
   className = "",
+  ...props
 }) {
   // Determine badge styling
   let variant = "neutral";
@@ -27,11 +29,18 @@ export function StatCard({
   }
 
   return (
-    <div
+    <motion.div
+      layout
+      whileHover={{
+        y: -3,
+        transition: { type: "spring", stiffness: 420, damping: 24 },
+      }}
+      whileTap={{ scale: 0.985 }}
       className={cn(
-        "rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/70 p-5 shadow-sm transition-all hover:border-zinc-300 dark:hover:border-zinc-700/80 group flex flex-col justify-between h-full min-h-[140px]",
+        "rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/70 p-5 shadow-sm transition-colors hover:border-indigo-500/30 dark:hover:border-indigo-500/40 group flex flex-col justify-between h-full min-h-[140px] relative overflow-hidden",
         className
       )}
+      {...props}
     >
       <div>
         <div className="flex items-center justify-between">
@@ -41,7 +50,7 @@ export function StatCard({
           {Icon && (
             <div
               className={cn(
-                "w-9 h-9 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110",
+                "w-9 h-9 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110",
                 iconBg
               )}
             >
@@ -80,6 +89,6 @@ export function StatCard({
           {subtext}
         </p>
       )}
-    </div>
+    </motion.div>
   );
 }
