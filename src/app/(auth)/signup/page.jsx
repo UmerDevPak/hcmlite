@@ -301,6 +301,24 @@ export default function SignUpPage() {
             </p>
           </div>
 
+          {/* Company Registration Notice */}
+          <div className="flex items-center justify-between p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5 text-xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0">
+                <Building2 className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <span className="font-semibold text-zinc-200 block truncate">Deploying a new organization?</span>
+                <span className="text-[11px] text-zinc-400 block truncate">Register company entity & Super Admin</span>
+              </div>
+            </div>
+            <Link href="/setup" className="shrink-0 ml-2">
+              <Button variant="outline" size="sm" className="text-xs h-8">
+                Setup Wizard
+              </Button>
+            </Link>
+          </div>
+
           {formError && (
             <div className="p-3.5 rounded-xl border border-rose-500/30 bg-rose-950/20 text-xs text-rose-300 space-y-1">
               <p className="font-semibold text-rose-200">Registration Notice</p>

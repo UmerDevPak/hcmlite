@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
 import {
   Clock,
   MapPin,
@@ -90,55 +92,78 @@ export default function AttendancePage() {
   const isClockedIn = Boolean(todayPunch?.clockIn && !todayPunch?.clockOut);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={containerStagger}
+      className="space-y-6"
+    >
       {/* Header */}
-      <div className="pb-2 border-b border-zinc-200 dark:border-zinc-800">
+      <motion.div
+        variants={itemFadeUp}
+        className="pb-2 border-b border-zinc-200 dark:border-zinc-800"
+      >
         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           Attendance & Time Tracking
         </h1>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
           Monitor real-time employee check-ins, remote hours, and shift compliance.
         </p>
-      </div>
+      </motion.div>
 
-      {/* KPI stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="On-Duty Present"
-          value={stats?.present || 7}
-          subtext="Checked in today"
-          icon={CheckCircle2}
-          iconColor="text-emerald-400"
-          iconBg="bg-emerald-500/10"
-        />
-        <StatCard
-          title="On Planned Leave"
-          value={stats?.onLeave || 1}
-          subtext="Approved absence"
-          icon={Calendar}
-          iconColor="text-amber-400"
-          iconBg="bg-amber-500/10"
-        />
-        <StatCard
-          title="Attendance Rate"
-          value={`${stats?.presentRate || 88}%`}
-          subtext="Target: >85%"
-          icon={Clock}
-          iconColor="text-indigo-400"
-          iconBg="bg-indigo-500/10"
-        />
-        <StatCard
-          title="Active Workforce"
-          value={stats?.totalEmployees || 8}
-          subtext="Headcount tracked"
-          icon={Users}
-          iconColor="text-purple-400"
-          iconBg="bg-purple-500/10"
-        />
-      </div>
+      {/* KPI stats (Staggered Pop-In) */}
+      <motion.div
+        variants={containerStagger}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
+        <motion.div variants={itemFadeUp}>
+          <StatCard
+            title="On-Duty Present"
+            value={stats?.present || 7}
+            subtext="Checked in today"
+            icon={CheckCircle2}
+            iconColor="text-emerald-400"
+            iconBg="bg-emerald-500/10"
+          />
+        </motion.div>
+        <motion.div variants={itemFadeUp}>
+          <StatCard
+            title="On Planned Leave"
+            value={stats?.onLeave || 1}
+            subtext="Approved absence"
+            icon={Calendar}
+            iconColor="text-amber-400"
+            iconBg="bg-amber-500/10"
+          />
+        </motion.div>
+        <motion.div variants={itemFadeUp}>
+          <StatCard
+            title="Attendance Rate"
+            value={`${stats?.presentRate || 88}%`}
+            subtext="Target: >85%"
+            icon={Clock}
+            iconColor="text-indigo-400"
+            iconBg="bg-indigo-500/10"
+          />
+        </motion.div>
+        <motion.div variants={itemFadeUp}>
+          <StatCard
+            title="Active Workforce"
+            value={stats?.totalEmployees || 8}
+            subtext="Headcount tracked"
+            icon={Users}
+            iconColor="text-purple-400"
+            iconBg="bg-purple-500/10"
+          />
+        </motion.div>
+      </motion.div>
 
-      {/* Punch Clock Station Card */}
-      <Card className="p-6">
+      {/* Punch Clock Station Card with Smooth Pop-In */}
+      <motion.div
+        variants={itemFadeUp}
+        whileHover={{ y: -3, transition: { duration: 0.16 } }}
+      >
+        <Card className="p-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
@@ -205,8 +230,10 @@ export default function AttendancePage() {
           </div>
         </div>
       </Card>
+      </motion.div>
 
       {/* Attendance Log Table */}
+      <motion.div variants={itemFadeUp}>
       <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Today&apos;s Attendance Ledger</CardTitle>
@@ -278,6 +305,7 @@ export default function AttendancePage() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
 import {
   Clock,
   CalendarDays,
@@ -197,9 +199,17 @@ export default function EmployeeDashboardPage() {
     .reverse();
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={containerStagger}
+      className="space-y-6"
+    >
       {/* 1. Header: Welcome back, Employee Name, Department & Designation */}
-      <div className="relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-indigo-950/40 border border-zinc-800 shadow-elevated">
+      <motion.div
+        variants={itemFadeUp}
+        className="relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/95 to-indigo-950/40 border border-zinc-800 shadow-elevated"
+      >
         {/* Subtle decorative vector backdrop pattern */}
         <div className="absolute inset-0 pointer-events-none opacity-20 [mask-image:radial-gradient(ellipse_at_top_right,white,transparent_75%)]">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
@@ -260,11 +270,15 @@ export default function EmployeeDashboardPage() {
             Apply Leave
           </Button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* 2. Top Action & Metrics Cards (4 cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+      {/* 2. Top Action & Metrics Cards (4 cards with smooth pop-in and hover lift) */}
+      <motion.div
+        variants={containerStagger}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch"
+      >
         {/* Card 1: Attendance Action Widget */}
+        <motion.div variants={itemFadeUp} whileHover={{ y: -3, transition: { duration: 0.16 } }} className="h-full">
         <Card className="p-4 flex flex-col justify-between h-full min-h-[220px] relative overflow-hidden border-indigo-500/30 bg-gradient-to-b from-zinc-900 to-indigo-950/20">
           <div>
             <div className="flex items-center justify-between pb-1">
@@ -302,8 +316,10 @@ export default function EmployeeDashboardPage() {
             </Button>
           </div>
         </Card>
+        </motion.div>
 
         {/* Card 2: Weekly Hours Logged */}
+        <motion.div variants={itemFadeUp} whileHover={{ y: -3, transition: { duration: 0.16 } }} className="h-full">
         <Card className="p-4 flex flex-col justify-between h-full min-h-[220px]">
           <div>
             <div className="flex items-center justify-between">
@@ -325,9 +341,11 @@ export default function EmployeeDashboardPage() {
             {/* Progress Bar */}
             <div className="mt-3 space-y-1">
               <div className="h-2 w-full rounded-full bg-zinc-800 overflow-hidden">
-                <div
-                  className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min(100, weeklyHours.percentage)}%` }}
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min(100, weeklyHours.percentage)}%` }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="h-full bg-indigo-500 rounded-full"
                 />
               </div>
               <div className="flex justify-between text-[10px] text-zinc-400 pt-0.5">
@@ -341,8 +359,10 @@ export default function EmployeeDashboardPage() {
             Target: 40 hrs/week • Standard shift
           </div>
         </Card>
+        </motion.div>
 
         {/* Card 3: Lates This Month */}
+        <motion.div variants={itemFadeUp} whileHover={{ y: -3, transition: { duration: 0.16 } }} className="h-full">
         <Card className="p-4 flex flex-col justify-between h-full min-h-[220px]">
           <div>
             <div className="flex items-center justify-between">
@@ -390,8 +410,10 @@ export default function EmployeeDashboardPage() {
             Rule 6: 3 lates (&gt; 09:15) = 1 half-day deduction
           </div>
         </Card>
+        </motion.div>
 
         {/* Card 4: Leave Balance Summary */}
+        <motion.div variants={itemFadeUp} whileHover={{ y: -3, transition: { duration: 0.16 } }} className="h-full">
         <Card className="p-4 flex flex-col justify-between h-full min-h-[220px]">
           <div>
             <div className="flex items-center justify-between">
@@ -433,10 +455,11 @@ export default function EmployeeDashboardPage() {
             Rule 5: 14 Annual • 8 Sick • 10 Casual quota
           </div>
         </Card>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* 3. Primary Attendance & Compensation Row (Calendar + Payslip) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      <motion.div variants={itemFadeUp} className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         {/* Left Column (lg:col-span-2): Monthly Attendance Calendar */}
         <Card className="lg:col-span-2 flex flex-col justify-between h-full">
           <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3">
@@ -667,10 +690,10 @@ export default function EmployeeDashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
       {/* 4. Secondary Operations & Noticeboard Tier (Leave Requests, Shift Logs + Company Noticeboard) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      <motion.div variants={itemFadeUp} className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         {/* Left Column (lg:col-span-2): Leave Requests & Verified Shifts */}
         <div className="lg:col-span-2 space-y-6 flex flex-col justify-between">
           {/* Section B: Quick Leave Application Shortcut & Recent Requests */}
@@ -896,7 +919,7 @@ export default function EmployeeDashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
       {/* Modals */}
       <LeaveRequestModal
@@ -914,6 +937,6 @@ export default function EmployeeDashboardPage() {
           payDate: latestPayslip?.payDate || "2026-10-15",
         }}
       />
-    </div>
+    </motion.div>
   );
 }

@@ -284,6 +284,24 @@ export default function LoginPage() {
             </p>
           </div>
 
+          {/* Register Company / Organization Banner */}
+          <div className="flex items-center justify-between p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5 text-xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0">
+                <Building2 className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <span className="font-semibold text-zinc-200 block truncate">Deploying a new organization?</span>
+                <span className="text-[11px] text-zinc-400 block truncate">Register company entity & Super Admin</span>
+              </div>
+            </div>
+            <Link href="/setup" className="shrink-0 ml-2">
+              <Button variant="outline" size="sm" className="text-xs h-8">
+                Register Company
+              </Button>
+            </Link>
+          </div>
+
           {/* Who is logging in? Role Selector */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -439,14 +457,18 @@ export default function LoginPage() {
               Sign In
             </Button>
 
-            <div className="text-center pt-2">
-              <p className="text-xs text-zinc-400">
-                Don&apos;t have an account?{" "}
+            <div className="space-y-3 pt-2 text-center text-xs">
+              <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-900/60 text-[11px] text-zinc-400 leading-relaxed text-left">
+                <strong className="text-zinc-200 block mb-0.5">Corporate Access Protocol:</strong>
+                Employees and HR staff receive corporate login credentials directly from their Organization Administrator upon onboarding.
+              </div>
+              <p className="text-zinc-400">
+                Registering a new company?{" "}
                 <Link
-                  href="/signup"
+                  href="/setup"
                   className="font-medium text-indigo-400 hover:text-indigo-300 underline underline-offset-4 transition-colors"
                 >
-                  Create account
+                  Register Company & Admin
                 </Link>
               </p>
             </div>

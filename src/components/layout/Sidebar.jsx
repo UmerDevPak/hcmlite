@@ -20,6 +20,7 @@ import {
   Sparkles,
   User,
   ShieldAlert,
+  CheckSquare,
   X,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -54,6 +55,7 @@ export function Sidebar({ isOpen, onClose }) {
     {
       group: "Workforce & Operations",
       items: [
+        { name: "Tasks & OKRs", href: "/tasks", icon: CheckSquare },
         { name: "Company Attendance", href: "/attendance", icon: Clock },
         { name: "Leaves & Absence", href: "/leave", icon: CalendarDays },
         { name: "Finalize Payroll", href: "/payroll", icon: CreditCard },
@@ -81,6 +83,7 @@ export function Sidebar({ isOpen, onClose }) {
     {
       group: "Workforce Tracking",
       items: [
+        { name: "Task Review Queue", href: "/tasks", icon: CheckSquare },
         { name: "Daily Attendance Board", href: "/attendance", icon: Clock },
         { name: "Leave Approvals", href: "/leave", icon: CalendarDays },
       ],
@@ -101,6 +104,7 @@ export function Sidebar({ isOpen, onClose }) {
       group: "Self-Service",
       items: [
         { name: "My Dashboard", href: "/employee", icon: LayoutDashboard },
+        { name: "My Tasks & Deliverables", href: "/tasks", icon: CheckSquare },
         { name: "My Attendance", href: "/attendance", icon: Clock },
         { name: "Apply Leave", href: "/leave", icon: CalendarDays },
         { name: "My Payslips", href: "/employee", icon: CreditCard },
@@ -143,6 +147,7 @@ export function Sidebar({ isOpen, onClose }) {
     {
       group: "Talent Management",
       items: [
+        { name: "Tasks & Deliverables", href: "/tasks", icon: CheckSquare },
         { name: "Recruitment (ATS)", href: "/recruitment", icon: Briefcase },
         { name: "Performance & OKRs", href: "/performance", icon: TrendingUp },
       ],

@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
 import {
   ShieldAlert,
   AlertCircle,
@@ -134,6 +136,25 @@ export default function ComplaintsPage() {
   const escalatedToAdminCount = complaints.filter((c) => c.status === "ESCALATED_TO_ADMIN").length;
   const resolvedCount = complaints.filter((c) => c.status === "RESOLVED").length;
 
+  // Category & Urgency breakdown telemetry
+  const categoryStats = COMPLAINT_CATEGORIES.map((cat) => {
+    const count = complaints.filter((c) => c.category === cat.id).length;
+    const percent = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+    return { ...cat, count, percent };
+  });
+
+  const urgencyLevels = [
+    { level: "Urgent", color: "bg-rose-500", text: "text-rose-400", bar: "from-rose-500 to-rose-600" },
+    { level: "High", color: "bg-amber-500", text: "text-amber-400", bar: "from-amber-500 to-amber-600" },
+    { level: "Medium", color: "bg-indigo-500", text: "text-indigo-400", bar: "from-indigo-500 to-indigo-600" },
+    { level: "Low", color: "bg-zinc-500", text: "text-zinc-400", bar: "from-zinc-500 to-zinc-600" },
+  ];
+  const urgencyStats = urgencyLevels.map((u) => {
+    const count = complaints.filter((c) => c.urgency === u.level).length;
+    const percent = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+    return { ...u, count, percent };
+  });
+
   // Actions
   const handleCreateSubmit = (e) => {
     e.preventDefault();
@@ -259,9 +280,17 @@ export default function ComplaintsPage() {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in pb-16">
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={containerStagger}
+      className="space-y-8 pb-16"
+    >
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-zinc-900/90 via-zinc-900/50 to-zinc-950 shadow-elevated relative overflow-hidden">
+      <motion.div
+        variants={itemFadeUp}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-zinc-900/90 via-zinc-900/50 to-zinc-950 shadow-elevated relative overflow-hidden"
+      >
         <div className="absolute top-0 right-0 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -304,27 +333,61 @@ export default function ComplaintsPage() {
             File New Grievance
           </Button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Metric KPI Overview */}
-      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm space-y-2">
+      {/* Metric KPI Overview (Staggered Pop-In Cards) */}
+      <motion.div
+        variants={containerStagger}
+        className="grid grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+      >
+        <motion.div
+          variants={itemFadeUp}
+          whileHover={{ y: -4, transition: { duration: 0.16 } }}
+          whileTap={{ scale: 0.985 }}
+          className="p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm space-y-2 hover:border-zinc-700 transition-colors"
+        >
           <span className="text-xs font-medium text-zinc-400">Total Cases Logged</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold tracking-tight text-zinc-100">{totalCount}</span>
             <span className="text-[10px] font-mono text-zinc-500">Corporate Registry</span>
           </div>
-        </div>
+          <div className="h-1 w-full rounded-full bg-zinc-800 overflow-hidden mt-1">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="h-full rounded-full bg-indigo-500"
+            />
+          </div>
+        </motion.div>
 
-        <div className="p-4 sm:p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 shadow-sm space-y-2">
+        <motion.div
+          variants={itemFadeUp}
+          whileHover={{ y: -4, transition: { duration: 0.16 } }}
+          whileTap={{ scale: 0.985 }}
+          className="p-4 sm:p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 shadow-sm space-y-2 hover:border-amber-500/40 transition-colors"
+        >
           <span className="text-xs font-medium text-amber-400">Pending HR Intake</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold tracking-tight text-amber-300">{pendingTriageCount}</span>
             <span className="text-[10px] font-mono text-amber-500">Awaiting Assignment</span>
           </div>
-        </div>
+          <div className="h-1 w-full rounded-full bg-zinc-800 overflow-hidden mt-1">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${totalCount > 0 ? (pendingTriageCount / totalCount) * 100 : 0}%` }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="h-full rounded-full bg-amber-500"
+            />
+          </div>
+        </motion.div>
 
-        <div className="p-4 sm:p-5 rounded-2xl border border-purple-500/20 bg-purple-500/5 shadow-sm space-y-2 relative overflow-hidden">
+        <motion.div
+          variants={itemFadeUp}
+          whileHover={{ y: -4, transition: { duration: 0.16 } }}
+          whileTap={{ scale: 0.985 }}
+          className="p-4 sm:p-5 rounded-2xl border border-purple-500/20 bg-purple-500/5 shadow-sm space-y-2 relative overflow-hidden hover:border-purple-500/40 transition-colors"
+        >
           {escalatedToAdminCount > 0 && (
             <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-purple-500 animate-ping" />
           )}
@@ -333,19 +396,145 @@ export default function ComplaintsPage() {
             <span className="text-2xl font-bold tracking-tight text-purple-300">{escalatedToAdminCount}</span>
             <span className="text-[10px] font-mono text-purple-400 uppercase">Requires Sign-off</span>
           </div>
-        </div>
+          <div className="h-1 w-full rounded-full bg-zinc-800 overflow-hidden mt-1">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${totalCount > 0 ? (escalatedToAdminCount / totalCount) * 100 : 0}%` }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="h-full rounded-full bg-purple-500"
+            />
+          </div>
+        </motion.div>
 
-        <div className="p-4 sm:p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 shadow-sm space-y-2">
+        <motion.div
+          variants={itemFadeUp}
+          whileHover={{ y: -4, transition: { duration: 0.16 } }}
+          whileTap={{ scale: 0.985 }}
+          className="p-4 sm:p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 shadow-sm space-y-2 hover:border-emerald-500/40 transition-colors"
+        >
           <span className="text-xs font-medium text-emerald-400">Resolved & Closed</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold tracking-tight text-emerald-300">{resolvedCount}</span>
             <span className="text-[10px] font-mono text-emerald-500">Remediated</span>
           </div>
+          <div className="h-1 w-full rounded-full bg-zinc-800 overflow-hidden mt-1">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${totalCount > 0 ? (resolvedCount / totalCount) * 100 : 0}%` }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="h-full rounded-full bg-emerald-500"
+            />
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Visual Telemetry: Category & Urgency Distribution with Animated Progress Bars */}
+      <motion.div variants={itemFadeUp}>
+        <div className="p-5 sm:p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
+            <div>
+              <h2 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-rose-400" />
+                Grievance Telemetry & Intake Analytics
+              </h2>
+              <p className="text-xs text-zinc-400 mt-0.5">
+                Real-time breakdown of logged incidents across corporate categories and priority levels.
+              </p>
+            </div>
+            <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-300 self-start sm:self-auto border border-zinc-700">
+              {totalCount} Total Case Distribution
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left: Category Breakdown with animated gradient bars */}
+            <div className="space-y-3">
+              <span className="text-xs font-semibold text-zinc-300 uppercase tracking-wider block">
+                Category Distribution
+              </span>
+              <div className="space-y-2.5">
+                {categoryStats.map((cat) => (
+                  <div key={cat.id} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-zinc-300 font-medium truncate">{cat.label}</span>
+                      <div className="flex items-center gap-2 shrink-0 font-mono">
+                        <span className="text-zinc-400 text-[11px]">{cat.count} {cat.count === 1 ? "case" : "cases"}</span>
+                        <span className="font-semibold text-zinc-200">{cat.percent}%</span>
+                      </div>
+                    </div>
+                    {/* Animated Progress Bar */}
+                    <div className="h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.max(cat.percent, cat.count > 0 ? 8 : 0)}%` }}
+                        transition={{ duration: 0.55, ease: "easeOut" }}
+                        className="h-full rounded-full bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Urgency Severity Matrix */}
+            <div className="space-y-3 flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-semibold text-zinc-300 uppercase tracking-wider block mb-3">
+                  Priority Severity Matrix
+                </span>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {urgencyStats.map((u) => (
+                    <motion.div
+                      key={u.level}
+                      whileHover={{ y: -2, transition: { duration: 0.15 } }}
+                      className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 space-y-2"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className={cn("font-bold text-xs uppercase tracking-wider", u.text)}>
+                          {u.level}
+                        </span>
+                        <span className="font-mono text-zinc-400 text-[11px] font-semibold">
+                          {u.percent}%
+                        </span>
+                      </div>
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-xl font-extrabold font-mono text-zinc-100">{u.count}</span>
+                        <span className="text-[10px] text-zinc-500">tickets</span>
+                      </div>
+                      {/* Animated Bar */}
+                      <div className="h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${u.percent}%` }}
+                          transition={{ duration: 0.55, ease: "easeOut" }}
+                          className={cn("h-full rounded-full bg-gradient-to-r", u.bar)}
+                        />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Policy Note Callout */}
+              <div className="p-3.5 rounded-xl border border-rose-500/20 bg-rose-950/20 text-xs text-rose-300 space-y-1 mt-3">
+                <div className="font-semibold flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
+                  Anti-Retaliation Policy Protection
+                </div>
+                <p className="text-[11px] text-zinc-400">
+                  Whistleblower submissions are cryptographically encrypted. Anonymous filings strip filer metadata and employee IP identifiers.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm">
+      <motion.div
+        variants={itemFadeUp}
+        className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm"
+      >
         {/* Navigation Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 md:pb-0 text-xs">
           {[
@@ -395,10 +584,10 @@ export default function ComplaintsPage() {
             <option value="Low">Low</option>
           </select>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Complaints List Cards */}
-      <div className="space-y-4">
+      {/* Complaints List Cards (Staggered Pop-In with Smooth Hover) */}
+      <motion.div variants={containerStagger} className="space-y-4">
         {filteredComplaints.length === 0 ? (
           <div className="p-12 text-center rounded-3xl border border-zinc-800 bg-zinc-900/30 text-zinc-400 space-y-3">
             <ShieldCheck className="w-10 h-10 mx-auto text-zinc-600 stroke-[1.5]" />
@@ -413,10 +602,12 @@ export default function ComplaintsPage() {
             const statusObj = COMPLAINT_STATUS[item.status] || COMPLAINT_STATUS.PENDING_HR;
 
             return (
-              <div
+              <motion.div
                 key={item.id}
+                variants={itemFadeUp}
+                whileHover={{ y: -3, transition: { duration: 0.16 } }}
                 className={cn(
-                  "p-5 sm:p-6 rounded-2xl border transition-all duration-200 bg-white dark:bg-zinc-900/60 shadow-sm space-y-4 hover:border-zinc-700",
+                  "p-5 sm:p-6 rounded-2xl border transition-colors duration-150 bg-white dark:bg-zinc-900/60 shadow-sm space-y-4 hover:border-zinc-700",
                   item.status === "ESCALATED_TO_ADMIN"
                     ? "border-purple-500/40 bg-purple-950/10"
                     : "border-zinc-200 dark:border-zinc-800"
@@ -581,11 +772,11 @@ export default function ComplaintsPage() {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })
         )}
-      </div>
+      </motion.div>
 
       {/* ========================================================= */}
       {/* MODAL 1: FILE NEW GRIEVANCE MODAL                         */}
@@ -1058,6 +1249,6 @@ export default function ComplaintsPage() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

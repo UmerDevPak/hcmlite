@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
 import {
   CreditCard,
   Plus,
@@ -10,6 +12,7 @@ import {
   CheckCircle2,
   DollarSign,
   TrendingUp,
+  PieChart,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
@@ -102,10 +105,26 @@ export default function PayrollPage() {
     notifySuccess("Export Ready", `Exported direct deposit file for batch ${run.id}.`);
   };
 
+  const latestGross = runs[0]?.totalGross || 48250;
+  const latestNet = runs[0]?.totalNet || 35120.45;
+  const latestTaxes = runs[0]?.totalTaxes || 10425.3;
+  const latestDeductions = runs[0]?.totalDeductions || Math.max(0, latestGross - latestNet - latestTaxes);
+  const netPercent = Math.round((latestNet / latestGross) * 100) || 72;
+  const taxPercent = Math.round((latestTaxes / latestGross) * 100) || 22;
+  const deductPercent = Math.max(0, 100 - netPercent - taxPercent);
+
   return (
-    <div className="space-y-6 animate-fade-in">
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={containerStagger}
+      className="space-y-6"
+    >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+      <motion.div
+        variants={itemFadeUp}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-zinc-200 dark:border-zinc-800"
+      >
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
             Payroll Processing & Direct Deposit
@@ -120,49 +139,133 @@ export default function PayrollPage() {
             Execute Payroll Batch
           </Button>
         )}
-      </div>
+      </motion.div>
 
-      {/* KPI Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Last Run Disbursed (Net)"
-          value={formatCurrency(runs[0]?.totalNet || 35120.45)}
-          subtext={`Gross: ${formatCurrency(runs[0]?.totalGross || 48250)}`}
-          icon={CreditCard}
-          iconColor="text-indigo-400"
-          iconBg="bg-indigo-500/10"
-        />
+      {/* KPI Stats (Staggered Pop-In) */}
+      <motion.div
+        variants={containerStagger}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
+        <motion.div variants={itemFadeUp}>
+          <StatCard
+            title="Last Run Disbursed (Net)"
+            value={formatCurrency(runs[0]?.totalNet || 35120.45)}
+            subtext={`Gross: ${formatCurrency(runs[0]?.totalGross || 48250)}`}
+            icon={CreditCard}
+            iconColor="text-indigo-400"
+            iconBg="bg-indigo-500/10"
+          />
+        </motion.div>
 
-        <StatCard
-          title="Withholding & Taxes"
-          value={formatCurrency(runs[0]?.totalTaxes || 10425.3)}
-          subtext="Federal, FICA, and State"
-          icon={DollarSign}
-          iconColor="text-rose-400"
-          iconBg="bg-rose-500/10"
-        />
+        <motion.div variants={itemFadeUp}>
+          <StatCard
+            title="Withholding & Taxes"
+            value={formatCurrency(runs[0]?.totalTaxes || 10425.3)}
+            subtext="Federal, FICA, and State"
+            icon={DollarSign}
+            iconColor="text-rose-400"
+            iconBg="bg-rose-500/10"
+          />
+        </motion.div>
 
-        <StatCard
-          title="Completed Batches"
-          value={runs.length}
-          subtext="100% on-time settlement"
-          icon={CheckCircle2}
-          iconColor="text-emerald-400"
-          iconBg="bg-emerald-500/10"
-        />
+        <motion.div variants={itemFadeUp}>
+          <StatCard
+            title="Completed Batches"
+            value={runs.length}
+            subtext="100% on-time settlement"
+            icon={CheckCircle2}
+            iconColor="text-emerald-400"
+            iconBg="bg-emerald-500/10"
+          />
+        </motion.div>
 
-        <StatCard
-          title="Next Scheduled Cycle"
-          value="Oct 31, 2026"
-          subtext="Bi-weekly cadence"
-          icon={TrendingUp}
-          iconColor="text-purple-400"
-          iconBg="bg-purple-500/10"
-        />
-      </div>
+        <motion.div variants={itemFadeUp}>
+          <StatCard
+            title="Next Scheduled Cycle"
+            value="Oct 31, 2026"
+            subtext="Bi-weekly cadence"
+            icon={TrendingUp}
+            iconColor="text-purple-400"
+            iconBg="bg-purple-500/10"
+          />
+        </motion.div>
+      </motion.div>
+
+      {/* Gross-to-Net Capital Allocation Telemetry Bar */}
+      <motion.div
+        variants={itemFadeUp}
+        whileHover={{ y: -3, transition: { duration: 0.16 } }}
+        className="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm space-y-3"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+              <PieChart className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-200">
+                Gross-to-Net Capital Distribution
+              </h3>
+              <p className="text-[11px] text-zinc-400">
+                Active settlement breakdown across take-home wages, tax withholdings, and statutory reserves.
+              </p>
+            </div>
+          </div>
+          <span className="text-xs font-mono font-semibold text-zinc-300">
+            Total Batch: {formatCurrency(latestGross)}
+          </span>
+        </div>
+
+        {/* Multi-segment Animated Progress Bar */}
+        <div className="h-3 w-full rounded-full bg-zinc-800 overflow-hidden flex gap-1 p-0.5">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${netPercent}%` }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400"
+            title={`Net Take-Home: ${netPercent}%`}
+          />
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${taxPercent}%` }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+            className="h-full rounded-full bg-gradient-to-r from-rose-500 to-rose-400"
+            title={`Tax Withholdings: ${taxPercent}%`}
+          />
+          {deductPercent > 0 && (
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${deductPercent}%` }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+              className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400"
+              title={`Voluntary Deductions: ${deductPercent}%`}
+            />
+          )}
+        </div>
+
+        {/* Legend */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+            <span className="text-zinc-400 text-[11px]">Net Take-Home:</span>
+            <span className="font-mono font-semibold text-emerald-400">{formatCurrency(latestNet)} ({netPercent}%)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+            <span className="text-zinc-400 text-[11px]">Tax Withholding:</span>
+            <span className="font-mono font-semibold text-rose-400">{formatCurrency(latestTaxes)} ({taxPercent}%)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+            <span className="text-zinc-400 text-[11px]">Benefits & Reserves:</span>
+            <span className="font-mono font-semibold text-amber-400">{formatCurrency(latestDeductions)} ({deductPercent}%)</span>
+          </div>
+        </div>
+      </motion.div>
 
       {/* Runs Table */}
-      <Card className="overflow-hidden">
+      <motion.div variants={itemFadeUp}>
+        <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Historical Payroll Disbursal Batches</CardTitle>
         </CardHeader>
@@ -246,6 +349,7 @@ export default function PayrollPage() {
           )}
         </CardContent>
       </Card>
+      </motion.div>
 
       {/* Modals */}
       <RunPayrollModal
@@ -260,6 +364,6 @@ export default function PayrollPage() {
         payslip={selectedPayslip}
         runInfo={selectedRunInfo}
       />
-    </div>
+    </motion.div>
   );
 }

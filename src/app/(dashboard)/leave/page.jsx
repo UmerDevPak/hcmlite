@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
 import confetti from "canvas-confetti";
 import {
   CalendarDays,
@@ -108,9 +110,17 @@ export default function LeavePage() {
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={containerStagger}
+      className="space-y-6"
+    >
+      {/* Header with Smooth Entrance */}
+      <motion.div
+        variants={itemFadeUp}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-zinc-200 dark:border-zinc-800"
+      >
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
             Leave & Absence Management
@@ -123,40 +133,82 @@ export default function LeavePage() {
         <Button size="sm" icon={Plus} onClick={() => setIsModalOpen(true)}>
           Request Time Off
         </Button>
-      </div>
+      </motion.div>
 
-      {/* Balance Cards (Rule 5: 14 Annual, 8 Sick, 10 Casual) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="p-4">
-          <div className="text-xs text-zinc-400">Annual Leave</div>
-          <div className="text-2xl font-bold font-mono text-indigo-400 mt-1">
+      {/* Balance Cards (Rule 5: 14 Annual, 8 Sick, 10 Casual) with Pop-In & Animated Bars */}
+      <motion.div variants={containerStagger} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <motion.div
+          variants={itemFadeUp}
+          whileHover={{ y: -4, transition: { duration: 0.16 } }}
+          whileTap={{ scale: 0.985 }}
+          className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/70 shadow-sm hover:border-indigo-500/40 transition-colors space-y-2"
+        >
+          <div className="text-xs font-medium text-zinc-400">Annual Leave</div>
+          <div className="text-2xl font-bold font-mono text-indigo-400">
             {balances?.annual ?? 14}{" "}
             <span className="text-xs font-normal text-zinc-400">/ 14 days left</span>
           </div>
-          <p className="text-[11px] text-zinc-500 mt-1">Statutory annual entitlement</p>
-        </Card>
+          {/* Animated Progress Bar */}
+          <div className="h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden mt-2">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(100, Math.round(((balances?.annual ?? 14) / 14) * 100))}%` }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+              className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-400"
+            />
+          </div>
+          <p className="text-[11px] text-zinc-500 pt-1">Statutory annual entitlement</p>
+        </motion.div>
 
-        <Card className="p-4">
-          <div className="text-xs text-zinc-400">Sick Leave</div>
-          <div className="text-2xl font-bold font-mono text-emerald-400 mt-1">
+        <motion.div
+          variants={itemFadeUp}
+          whileHover={{ y: -4, transition: { duration: 0.16 } }}
+          whileTap={{ scale: 0.985 }}
+          className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/70 shadow-sm hover:border-emerald-500/40 transition-colors space-y-2"
+        >
+          <div className="text-xs font-medium text-zinc-400">Sick Leave</div>
+          <div className="text-2xl font-bold font-mono text-emerald-400">
             {balances?.sick ?? 8}{" "}
             <span className="text-xs font-normal text-zinc-400">/ 8 days left</span>
           </div>
-          <p className="text-[11px] text-zinc-500 mt-1">Medical absence coverage</p>
-        </Card>
+          {/* Animated Progress Bar */}
+          <div className="h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden mt-2">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(100, Math.round(((balances?.sick ?? 8) / 8) * 100))}%` }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400"
+            />
+          </div>
+          <p className="text-[11px] text-zinc-500 pt-1">Medical absence coverage</p>
+        </motion.div>
 
-        <Card className="p-4">
-          <div className="text-xs text-zinc-400">Casual Leave</div>
-          <div className="text-2xl font-bold font-mono text-amber-400 mt-1">
+        <motion.div
+          variants={itemFadeUp}
+          whileHover={{ y: -4, transition: { duration: 0.16 } }}
+          whileTap={{ scale: 0.985 }}
+          className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/70 shadow-sm hover:border-amber-500/40 transition-colors space-y-2"
+        >
+          <div className="text-xs font-medium text-zinc-400">Casual Leave</div>
+          <div className="text-2xl font-bold font-mono text-amber-400">
             {balances?.casual ?? 10}{" "}
             <span className="text-xs font-normal text-zinc-400">/ 10 days left</span>
           </div>
-          <p className="text-[11px] text-zinc-500 mt-1">Short-notice emergency leave</p>
-        </Card>
-      </div>
+          {/* Animated Progress Bar */}
+          <div className="h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden mt-2">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(100, Math.round(((balances?.casual ?? 10) / 10) * 100))}%` }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+              className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400"
+            />
+          </div>
+          <p className="text-[11px] text-zinc-500 pt-1">Short-notice emergency leave</p>
+        </motion.div>
+      </motion.div>
 
       {/* Requests Tabs & Table */}
-      <div className="space-y-4">
+      <motion.div variants={itemFadeUp} className="space-y-4">
         <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
         <Card className="overflow-hidden">
@@ -279,7 +331,7 @@ export default function LeavePage() {
             </div>
           )}
         </Card>
-      </div>
+      </motion.div>
 
       {/* Modal */}
       <LeaveRequestModal
@@ -287,6 +339,6 @@ export default function LeavePage() {
         onClose={() => setIsModalOpen(false)}
         onSubmitted={loadData}
       />
-    </div>
+    </motion.div>
   );
 }
