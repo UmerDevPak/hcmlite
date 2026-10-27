@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
+import { containerStagger, itemFadeUp, scrollViewport } from "@/lib/animationVariants";
 import {
   CreditCard,
   Plus,
@@ -41,14 +41,9 @@ export default function PayrollPage() {
   const [selectedRunInfo, setSelectedRunInfo] = useState(null);
   const [isPayslipModalOpen, setIsPayslipModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading && user && !isAdmin && !isHR) {
-      router.replace("/employee");
-    }
-  }, [user, isAdmin, isHR, authLoading, router]);
+  const isManagement = isAdmin || isHR;
 
   const fetchPayroll = async () => {
-    if (!isAdmin && !isHR) return;
     try {
       const data = await payrollService.getAllPayrollRuns();
       setRuns(data);
@@ -58,12 +53,10 @@ export default function PayrollPage() {
   };
 
   useEffect(() => {
-    if (isAdmin || isHR) {
-      fetchPayroll();
-    }
-  }, [isAdmin, isHR]);
+    fetchPayroll();
+  }, []);
 
-  if (!authLoading && (!user || (!isAdmin && !isHR))) {
+  if (!authLoading && !user) {
     return null;
   }
 
@@ -127,10 +120,12 @@ export default function PayrollPage() {
       >
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Payroll Processing & Direct Deposit
+            {isManagement ? "Payroll Processing & Direct Deposit" : "My Earnings Statements & Payslip History"}
           </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-            Automated gross-to-net tax calculations, direct deposit vouchers, and compliance reports.
+            {isManagement
+              ? "Automated gross-to-net tax calculations, direct deposit vouchers, and compliance reports."
+              : "Official bi-weekly pay vouchers, federal & state tax withholdings, and compensation statements."}
           </p>
         </div>
 
@@ -148,9 +143,9 @@ export default function PayrollPage() {
       >
         <motion.div variants={itemFadeUp}>
           <StatCard
-            title="Last Run Disbursed (Net)"
-            value={formatCurrency(runs[0]?.totalNet || 35120.45)}
-            subtext={`Gross: ${formatCurrency(runs[0]?.totalGross || 48250)}`}
+            title={isManagement ? "Last Run Disbursed (Net)" : "Latest Net Paycheck"}
+            value={formatCurrency(isManagement ? (runs[0]?.totalNet || 35120.45) : (runs[0]?.payslips?.[0]?.netSalary || 5640))}
+            subtext={isManagement ? `Gross: ${formatCurrency(runs[0]?.totalGross || 48250)}` : "Disbursed via Direct Deposit"}
             icon={CreditCard}
             iconColor="text-indigo-400"
             iconBg="bg-indigo-500/10"
@@ -160,7 +155,7 @@ export default function PayrollPage() {
         <motion.div variants={itemFadeUp}>
           <StatCard
             title="Withholding & Taxes"
-            value={formatCurrency(runs[0]?.totalTaxes || 10425.3)}
+            value={formatCurrency(isManagement ? (runs[0]?.totalTaxes || 10425.3) : (runs[0]?.payslips?.[0]?.taxWithheld || 1280))}
             subtext="Federal, FICA, and State"
             icon={DollarSign}
             iconColor="text-rose-400"
@@ -170,9 +165,9 @@ export default function PayrollPage() {
 
         <motion.div variants={itemFadeUp}>
           <StatCard
-            title="Completed Batches"
-            value={runs.length}
-            subtext="100% on-time settlement"
+            title={isManagement ? "Completed Batches" : "Direct Deposit Account"}
+            value={isManagement ? runs.length : "Verified (Active)"}
+            subtext={isManagement ? "100% on-time settlement" : "Chase Bank (•••• 4821)"}
             icon={CheckCircle2}
             iconColor="text-emerald-400"
             iconBg="bg-emerald-500/10"
@@ -191,8 +186,11 @@ export default function PayrollPage() {
         </motion.div>
       </motion.div>
 
-      {/* Gross-to-Net Capital Allocation Telemetry Bar */}
+      {/* Gross-to-Net Capital Allocation Telemetry Bar (Trigger on Scroll into View) */}
       <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
         variants={itemFadeUp}
         whileHover={{ y: -3, transition: { duration: 0.16 } }}
         className="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm space-y-3"
@@ -263,11 +261,18 @@ export default function PayrollPage() {
         </div>
       </motion.div>
 
-      {/* Runs Table */}
-      <motion.div variants={itemFadeUp}>
+      {/* Runs Table (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={itemFadeUp}
+      >
         <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle>Historical Payroll Disbursal Batches</CardTitle>
+          <CardTitle>
+            {isManagement ? "Historical Payroll Disbursal Batches" : "My Historical Payslips & Compensation Ledger"}
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {runs.length === 0 ? (

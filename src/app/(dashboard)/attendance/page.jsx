@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
+import { containerStagger, itemFadeUp, scrollViewport } from "@/lib/animationVariants";
 import {
   Clock,
   MapPin,
@@ -232,8 +232,13 @@ export default function AttendancePage() {
       </Card>
       </motion.div>
 
-      {/* Attendance Log Table */}
-      <motion.div variants={itemFadeUp}>
+      {/* Attendance Log Table (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={itemFadeUp}
+      >
       <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Today&apos;s Attendance Ledger</CardTitle>

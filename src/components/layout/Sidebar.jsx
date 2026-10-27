@@ -36,12 +36,46 @@ export function Sidebar({ isOpen, onClose }) {
 
   const handleSignOut = async () => {
     try {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(
+          "hcm_logout_popup",
+          JSON.stringify({
+            title: "Signed Out Successfully",
+            message: "Your enterprise session has been safely closed and local cache cleared.",
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          })
+        );
+      }
       await signOut();
       router.push("/login");
     } catch (e) {
       console.error("Sign out error", e);
     }
   };
+
+  // Eagerly prefetch all dashboard routes in background on login to make tab switching instant
+  React.useEffect(() => {
+    const prefetchRoutes = [
+      "/admin",
+      "/hr",
+      "/employee",
+      "/tasks",
+      "/attendance",
+      "/leave",
+      "/payroll",
+      "/complaints",
+      "/employees",
+      "/profile",
+      "/documents",
+      "/settings",
+      "/reports",
+    ];
+    prefetchRoutes.forEach((route) => {
+      try {
+        router.prefetch(route);
+      } catch (err) {}
+    });
+  }, [router]);
 
   const adminNavigation = [
     {
@@ -107,7 +141,7 @@ export function Sidebar({ isOpen, onClose }) {
         { name: "My Tasks & Deliverables", href: "/tasks", icon: CheckSquare },
         { name: "My Attendance", href: "/attendance", icon: Clock },
         { name: "Apply Leave", href: "/leave", icon: CalendarDays },
-        { name: "My Payslips", href: "/employee", icon: CreditCard },
+        { name: "My Payslips", href: "/payroll", icon: CreditCard },
         { name: "Grievances & Complaints", href: "/complaints", icon: ShieldAlert },
         { name: "My Profile", href: "/profile", icon: User },
       ],
@@ -233,6 +267,7 @@ export function Sidebar({ isOpen, onClose }) {
                     <Link
                       key={item.name}
                       href={item.href}
+                      prefetch={true}
                       onClick={() => onClose && onClose()}
                       className={cn(
                         "group flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-150",

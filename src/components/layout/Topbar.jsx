@@ -34,6 +34,16 @@ export function Topbar({ onOpenSidebar, onOpenCommandPalette }) {
 
   const handleSignOut = async () => {
     try {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(
+          "hcm_logout_popup",
+          JSON.stringify({
+            title: "Signed Out Successfully",
+            message: "Your enterprise session has been safely closed and local cache cleared.",
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          })
+        );
+      }
       await signOut();
       router.push("/login");
     } catch (e) {

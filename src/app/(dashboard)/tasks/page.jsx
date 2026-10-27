@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
+import { containerStagger, itemFadeUp, scrollViewport } from "@/lib/animationVariants";
 import {
   CheckSquare,
   Clock,
@@ -407,8 +407,11 @@ export default function TasksPage() {
         </motion.div>
       </motion.div>
 
-      {/* 3. Department Velocity Telemetry Bars */}
+      {/* 3. Department Velocity Telemetry Bars (Trigger on Scroll into View) */}
       <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
         variants={itemFadeUp}
         className="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm space-y-4"
       >
@@ -500,8 +503,14 @@ export default function TasksPage() {
         </div>
       </motion.div>
 
-      {/* 5. Task Cards Feed (Sequential Pop-In & Spring Hover) */}
-      <motion.div variants={containerStagger} className="space-y-4">
+      {/* 5. Task Cards Feed (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={containerStagger}
+        className="space-y-4"
+      >
         {filteredTasks.length === 0 ? (
           <div className="p-12 text-center rounded-3xl border border-zinc-800 bg-zinc-900/30 text-zinc-400 space-y-3">
             <CheckSquare className="w-10 h-10 mx-auto text-zinc-600 stroke-[1.5]" />

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
+import { containerStagger, itemFadeUp, scrollViewport } from "@/lib/animationVariants";
 import {
   Clock,
   CalendarDays,
@@ -458,8 +458,14 @@ export default function EmployeeDashboardPage() {
         </motion.div>
       </motion.div>
 
-      {/* 3. Primary Attendance & Compensation Row (Calendar + Payslip) */}
-      <motion.div variants={itemFadeUp} className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      {/* 3. Primary Attendance & Compensation Row (Calendar + Payslip, Trigger on Scroll) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={itemFadeUp}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch"
+      >
         {/* Left Column (lg:col-span-2): Monthly Attendance Calendar */}
         <Card className="lg:col-span-2 flex flex-col justify-between h-full">
           <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3">
@@ -692,8 +698,14 @@ export default function EmployeeDashboardPage() {
         </Card>
       </motion.div>
 
-      {/* 4. Secondary Operations & Noticeboard Tier (Leave Requests, Shift Logs + Company Noticeboard) */}
-      <motion.div variants={itemFadeUp} className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      {/* 4. Secondary Operations & Noticeboard Tier (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={itemFadeUp}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch"
+      >
         {/* Left Column (lg:col-span-2): Leave Requests & Verified Shifts */}
         <div className="lg:col-span-2 space-y-6 flex flex-col justify-between">
           {/* Section B: Quick Leave Application Shortcut & Recent Requests */}

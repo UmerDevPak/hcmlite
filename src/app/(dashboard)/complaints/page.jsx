@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
+import { containerStagger, itemFadeUp, scrollViewport } from "@/lib/animationVariants";
 import {
   ShieldAlert,
   AlertCircle,
@@ -428,8 +428,13 @@ export default function ComplaintsPage() {
         </motion.div>
       </motion.div>
 
-      {/* Visual Telemetry: Category & Urgency Distribution with Animated Progress Bars */}
-      <motion.div variants={itemFadeUp}>
+      {/* Visual Telemetry: Category & Urgency Distribution (Trigger on Scroll) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={itemFadeUp}
+      >
         <div className="p-5 sm:p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
             <div>
@@ -586,8 +591,14 @@ export default function ComplaintsPage() {
         </div>
       </motion.div>
 
-      {/* Complaints List Cards (Staggered Pop-In with Smooth Hover) */}
-      <motion.div variants={containerStagger} className="space-y-4">
+      {/* Complaints List Cards (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={containerStagger}
+        className="space-y-4"
+      >
         {filteredComplaints.length === 0 ? (
           <div className="p-12 text-center rounded-3xl border border-zinc-800 bg-zinc-900/30 text-zinc-400 space-y-3">
             <ShieldCheck className="w-10 h-10 mx-auto text-zinc-600 stroke-[1.5]" />

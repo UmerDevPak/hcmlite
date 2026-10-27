@@ -19,7 +19,7 @@ import { useAuth } from "@/context/AuthContext";
 import { normalizeRole } from "@/lib/constants";
 import { reportService } from "@/services/reportService";
 import { formatCurrency } from "@/lib/utils";
-import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
+import { containerStagger, itemFadeUp, scrollViewport } from "@/lib/animationVariants";
 import { StatCard } from "@/components/ui/StatCard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -198,8 +198,14 @@ export default function AdminDashboardPage() {
         </motion.div>
       </motion.div>
 
-      {/* 3. Visual Breakdown Grid with Interactive Recharts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* 3. Visual Breakdown Grid with Interactive Recharts (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={containerStagger}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+      >
         {/* Left Column: Interactive Workforce Distribution & Payroll Allocation Chart */}
         <motion.div variants={itemFadeUp} className="lg:col-span-2">
           <Card className="h-full flex flex-col">
@@ -300,10 +306,15 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
         </motion.div>
-      </div>
+      </motion.div>
 
-      {/* 4. Live Audit Feed Card with Motion */}
-      <motion.div variants={itemFadeUp}>
+      {/* 4. Live Audit Feed Card (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={itemFadeUp}
+      >
         <Card id="audit">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>

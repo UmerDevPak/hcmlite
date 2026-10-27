@@ -75,3 +75,14 @@ export const springLayoutTransition = {
   stiffness: 320,
   damping: 28,
 };
+
+/**
+ * Standard Viewport Observer configuration for scroll-triggered entrance.
+ * Ensures animations only run when scrolled into view and only fire once
+ * to prevent unnecessary re-triggering and CPU overhead.
+ */
+export const scrollViewport = {
+  once: true,
+  margin: "-20px",
+  amount: 0.1,
+};

@@ -24,7 +24,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { reportService } from "@/services/reportService";
 import { leaveService } from "@/services/leaveService";
 import { formatDate } from "@/lib/utils";
-import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
+import { containerStagger, itemFadeUp, scrollViewport } from "@/lib/animationVariants";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -318,8 +318,14 @@ export default function HrDashboardPage() {
         </motion.div>
       </motion.div>
 
-      {/* 3. Operational Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* 3. Operational Sections (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={containerStagger}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+      >
         {/* Section A: Pending Action Inbox (2 cols) */}
         <motion.div variants={itemFadeUp} className="lg:col-span-2">
           <Card className="h-full flex flex-col justify-between">
@@ -464,10 +470,15 @@ export default function HrDashboardPage() {
             </CardContent>
           </Card>
         </motion.div>
-      </div>
+      </motion.div>
 
-      {/* Section C: Attendance & Absenteeism Trend Chart */}
-      <motion.div variants={itemFadeUp}>
+      {/* Section C: Attendance & Absenteeism Trend Chart (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={itemFadeUp}
+      >
         <Card>
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <div>

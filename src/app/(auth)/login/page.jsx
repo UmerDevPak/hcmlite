@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Building2, ArrowRight, ShieldCheck, UserCheck, Users, User, Lock, Mail } from "lucide-react";
+import { Building2, ArrowRight, ShieldCheck, UserCheck, Users, User, Lock, Mail, CheckCircle2, X } from "lucide-react";
 import EnterpriseVectorHero from "@/components/auth/EnterpriseVectorHero";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
@@ -28,6 +28,19 @@ export default function LoginPage() {
   const [loginError, setLoginError] = useState("");
   const [pendingUser, setPendingUser] = useState(null);
   const [showForcePasswordModal, setShowForcePasswordModal] = useState(false);
+  const [logoutNotice, setLogoutNotice] = useState(null);
+
+  // Check for logout confirmation payload
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem("hcm_logout_popup");
+      if (stored) {
+        sessionStorage.removeItem("hcm_logout_popup");
+        const parsed = JSON.parse(stored);
+        setLogoutNotice(parsed);
+      }
+    } catch (e) {}
+  }, []);
 
   const handleSelectRole = (roleId, defaultEmail) => {
     setSelectedRole(roleId);
@@ -400,6 +413,36 @@ export default function LoginPage() {
               })}
             </div>
           </div>
+
+          {/* Logout Notification Popup */}
+          {logoutNotice && (
+            <div className="p-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-xs text-emerald-300 flex items-start justify-between gap-3 animate-fade-in shadow-lg">
+              <div className="flex items-start gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-emerald-200 text-sm">
+                    {logoutNotice.title || "Logged Out Successfully"}
+                  </h4>
+                  <p className="text-zinc-300 text-[11px] mt-0.5 leading-relaxed">
+                    {logoutNotice.message}
+                  </p>
+                  <span className="text-[10px] text-emerald-400/80 font-mono block mt-1">
+                    Session ended at {logoutNotice.time}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLogoutNotice(null)}
+                className="text-zinc-400 hover:text-zinc-200 p-1 rounded-md"
+                aria-label="Dismiss notice"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
 
           {/* Standard Form */}
           {loginError && (

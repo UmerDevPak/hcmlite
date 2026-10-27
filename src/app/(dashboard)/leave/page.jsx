@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { containerStagger, itemFadeUp } from "@/lib/animationVariants";
+import { containerStagger, itemFadeUp, scrollViewport } from "@/lib/animationVariants";
 import confetti from "canvas-confetti";
 import {
   CalendarDays,
@@ -207,8 +207,14 @@ export default function LeavePage() {
         </motion.div>
       </motion.div>
 
-      {/* Requests Tabs & Table */}
-      <motion.div variants={itemFadeUp} className="space-y-4">
+      {/* Requests Tabs & Table (Trigger on Scroll into View) */}
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={scrollViewport}
+        variants={itemFadeUp}
+        className="space-y-4"
+      >
         <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
         <Card className="overflow-hidden">
