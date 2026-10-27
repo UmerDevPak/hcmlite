@@ -202,7 +202,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Interactive Workforce Distribution & Payroll Allocation Chart */}
         <motion.div variants={itemFadeUp} className="lg:col-span-2">
-          <Card className="h-full flex flex-col justify-between">
+          <Card className="h-full flex flex-col">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
                 <CardTitle>Department Headcount & Monthly Payroll Allocation</CardTitle>
@@ -217,21 +217,22 @@ export default function AdminDashboardPage() {
                 View Directory <ExternalLink className="w-3 h-3" />
               </Link>
             </CardHeader>
-            <CardContent className="space-y-6 pt-2">
+            <CardContent className="space-y-5 pt-2 flex-1 flex flex-col justify-between">
               {/* Interactive Recharts Component with smooth morphing */}
               <WorkforceDistributionChart
                 departmentStats={departmentStats}
                 totalHeadcount={totalHeadcount}
               />
 
-              {/* Sequential Staggered Department List */}
-              <div className="border-t border-zinc-800/80 pt-4 space-y-3">
-                <div className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
-                  Division Personnel Detail
+              {/* Sequential Staggered Department List in compact 2-column grid */}
+              <div className="border-t border-zinc-800/80 pt-4 space-y-2.5">
+                <div className="flex items-center justify-between text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+                  <span>Division Personnel Detail</span>
+                  <span className="text-zinc-500 font-normal font-mono">{departmentStats.length} active teams</span>
                 </div>
                 <motion.div
                   variants={containerStagger}
-                  className="space-y-2.5"
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
                 >
                   {departmentStats.map((dept) => {
                     const headcountPercent = Math.round(
@@ -244,16 +245,14 @@ export default function AdminDashboardPage() {
                         className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-900/40 hover:bg-zinc-800/40 transition-colors space-y-1.5"
                       >
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-semibold text-zinc-200">{dept.name}</span>
-                          <div className="flex items-center gap-3">
-                            <span className="text-zinc-400">
-                              {dept.headcount} {dept.headcount === 1 ? "member" : "members"} (
-                              {headcountPercent}%)
-                            </span>
-                            <span className="font-mono font-semibold text-emerald-400">
-                              {formatCurrency(dept.totalSalary)}/mo
-                            </span>
-                          </div>
+                          <span className="font-semibold text-zinc-200 truncate">{dept.name}</span>
+                          <span className="font-mono font-semibold text-emerald-400 text-[11px] shrink-0">
+                            {formatCurrency(dept.totalSalary)}/mo
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                          <span>{dept.headcount} {dept.headcount === 1 ? "member" : "members"}</span>
+                          <span className="font-mono text-zinc-300 font-semibold">{headcountPercent}%</span>
                         </div>
                         {/* Animated Progress Bar */}
                         <div className="h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden">
@@ -275,21 +274,21 @@ export default function AdminDashboardPage() {
 
         {/* Right Column: Demographic Retention & Tenure Chart */}
         <motion.div variants={itemFadeUp}>
-          <Card className="h-full flex flex-col justify-between">
+          <Card className="h-full flex flex-col">
             <CardHeader className="pb-3 flex flex-col items-start gap-1">
               <CardTitle>Workforce Tenure Distribution</CardTitle>
               <p className="text-xs text-zinc-400">
                 Staff longevity, new hire onboarding, and seniority telemetry.
               </p>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="space-y-5 flex-1 flex flex-col justify-between">
               {/* Recharts Tenure Ring & Breakdown */}
               <WorkforceTenureChart
                 tenureStats={tenureStats}
                 totalEmployees={totalHeadcount}
               />
 
-              <div className="p-3.5 rounded-xl border border-indigo-500/20 bg-indigo-950/20 text-xs text-indigo-300 space-y-1">
+              <div className="p-3.5 rounded-xl border border-indigo-500/20 bg-indigo-950/20 text-xs text-indigo-300 space-y-1 mt-auto">
                 <div className="font-semibold flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
                   Administrative Policy Compliance
